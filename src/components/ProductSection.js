@@ -1,7 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
 const ProductSection = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type: 'product', onlyParents:true }),
+    })
+      .then(res => res.json())
+      .then(data => setProducts(data))
+      .catch(err => console.error('Fetch error:', err));
+  }, []);
+
   return (
     <section id="produk" className="product-section py-5 bg-light">
       <Container>
@@ -13,24 +28,14 @@ const ProductSection = () => {
         <Row className="justify-content-center">
           <Col lg={12}>
             <div className="d-flex overflow-auto">
-              <Card className="text-center me-3" style={{ minWidth: '200px' }}>
-                <Card.Img variant="top" src="/assets/images/mr.kyaiiphone.png" alt="Mr. Kyai" />
-                <Card.Body>
-                  <Card.Title>MR. KYAI</Card.Title>
-                </Card.Body>
-              </Card>
-              <Card className="text-center me-3" style={{ minWidth: '200px' }}>
-                <Card.Img variant="top" src="/assets/images/kedaimasteriphone.png" alt="Kedai Master" />
-                <Card.Body>
-                  <Card.Title>KEDAIMASTER</Card.Title>
-                </Card.Body>
-              </Card>
-              <Card className="text-center" style={{ minWidth: '200px' }}>
-                <Card.Img variant="top" src="/assets/images/mayageniphone.png" alt="Mayagen" />
-                <Card.Body>
-                  <Card.Title>MAYAGEN</Card.Title>
-                </Card.Body>
-              </Card>
+              {products.map((product, idx) => (
+                <Card key={idx} className="text-center me-3" style={{ minWidth: '200px' }}>
+                  <Card.Img variant="top" src={product.image || '/assets/images/placeholder.png'} alt={product.name} />
+                  <Card.Body>
+                    <Card.Title>{product.name}</Card.Title>
+                  </Card.Body>
+                </Card>
+              ))}
             </div>
           </Col>
         </Row>

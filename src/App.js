@@ -50,7 +50,7 @@ function App() {
       <div className="custom-image-section wow fadeInRight">
         <a href="https://registration.kediritechnopark.com/" target="_blank" className="custom-image-link" rel="noopener noreferrer">
           <div className="custom-image-wrapper">
-            <img src="/assets/images/FREE!.png" alt="Snack dan Jajanan" className="custom-image" />
+            <img src="/assets/images/FREE!.png" className="custom-image" />
             <div className="light-glare"></div>
           </div>
         </a>
