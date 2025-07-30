@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
+import styles from './Styles.module.css';
 
-const ProductSection = () => {
+
+const ProductSection = ({ hoveredCard, setHoveredCard, setSelectedProduct, setShowedModal, productSectionRef }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -10,7 +12,7 @@ const ProductSection = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ type: 'product', onlyParents:true }),
+      body: JSON.stringify({ type: 'product', onlyParents: true }),
     })
       .then(res => res.json())
       .then(data => setProducts(data))
@@ -18,27 +20,53 @@ const ProductSection = () => {
   }, []);
 
   return (
-    <section id="produk" className="product-section py-5 bg-light">
+
+    <section id="services" className="services py-5">
       <Container>
         <div className="section-heading text-center mb-4">
-          <h4>OUR <em>PRODUCT</em></h4>
+          <h4>OUR <em>PRODUCTS</em></h4>
           <img src="/assets/images/heading-line-dec.png" alt="" />
           <p>Kami menyediakan berbagai solusi teknologi untuk mendukung transformasi digital bisnis dan masyarakat.</p>
         </div>
-        <Row className="justify-content-center">
-          <Col lg={12}>
-            <div className="d-flex overflow-auto">
-              {products.map((product, idx) => (
-                <Card key={idx} className="text-center me-3" style={{ minWidth: '200px' }}>
-                  <Card.Img variant="top" src={product.image || '/assets/images/placeholder.png'} alt={product.name} />
-                  <Card.Body>
-                    <Card.Title>{product.name}</Card.Title>
-                  </Card.Body>
-                </Card>
-              ))}
-            </div>
-          </Col>
-        </Row>
+        <div className={styles.coursesGrid}>
+          {products &&
+            products[0]?.name &&
+            products.map(product => (
+              <div
+                key={product.id}
+                className={`${styles.courseCard} ${hoveredCard === product.id ? styles.courseCardHover : ''}`}
+                onClick={() => {
+                  setSelectedProduct(product);
+                  setShowedModal('product');
+                }}
+                onMouseEnter={() => setHoveredCard(product.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }}>
+                  {product.price === 0 && (
+                    <span className={styles.courseLabel}>Free</span>
+                  )}
+                </div>
+                <div className={styles.courseContent}>
+                  <h3 className={styles.courseTitle}>{product.name}</h3>
+                  <p className={styles.courseDesc}>{product.description}</p>
+                  <div className={styles.coursePrice}>
+                    <span
+                      className={
+                        product.price === 0
+                          ? styles.freePrice
+                          : styles.currentPrice
+                      }
+                    >
+                      {product.price == null
+                        ? 'Pay-As-You-Go'
+                        : `Rp ${product.price.toLocaleString('id-ID')}`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
       </Container>
     </section>
   );

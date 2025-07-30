@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
+import styles from './Styles.module.css';
 
-const AcademySection = () => {
+const AcademySection = ({hoveredCard, setHoveredCard, setSelectedProduct, setShowedModal, courseSectionRef}) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -18,43 +19,53 @@ const AcademySection = () => {
   }, []);
 
   return (
-    <section id="academy" className="academy-tables py-5">
+
+    <section id="services" className="services py-5">
       <Container>
         <div className="section-heading text-center mb-4">
           <h4>OUR <em>ACADEMY PROGRAM</em></h4>
           <img src="/assets/images/heading-line-dec.png" alt="" />
           <p>Academy Program adalah wadah belajar digital untuk anak-anak dan remaja. Didesain interaktif, kreatif, dan gratis — setiap modul membekali peserta dengan keterampilan masa depan, dari teknologi dasar hingga coding dan proyek nyata.</p>
         </div>
-        <Row>
-          {products.map((product, idx) => (
-            <Col lg={3} md={4} sm={6} xs={12} key={idx} className="mb-4">
-              <Card className="academy-item-regular h-100">
-                <Card.Body>
-                  <Card.Title>{product.name}</Card.Title>
-                  <div className="icon mb-3">
-                    <img src={product.image || '/assets/images/pricing-table-01.png'} alt={product.name} className="img-fluid" />
+        <div className={styles.coursesGrid}>
+          {products &&
+            products[0]?.name &&
+            products.map(product => (
+              <div
+                key={product.id}
+                className={`${styles.courseCard} ${hoveredCard === product.id ? styles.courseCardHover : ''}`}
+                onClick={() => {
+                  setSelectedProduct(product);
+                  setShowedModal('product');
+                }}
+                onMouseEnter={() => setHoveredCard(product.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }}>
+                  {product.price === 0 && (
+                    <span className={styles.courseLabel}>Free</span>
+                  )}
+                </div>
+                <div className={styles.courseContent}>
+                  <h3 className={styles.courseTitle}>{product.name}</h3>
+                  <p className={styles.courseDesc}>{product.description}</p>
+                  <div className={styles.coursePrice}>
+                    <span
+                      className={
+                        product.price === 0
+                          ? styles.freePrice
+                          : styles.currentPrice
+                      }
+                    >
+                      {product.price == null
+                        ? 'Pay-As-You-Go'
+                        : `Rp ${product.price.toLocaleString('id-ID')}`}
+                    </span>
                   </div>
-                  <ul>
-                    {product.duration && (
-                      <li>
-                        Durasi:{" "}
-                        {product.duration.hours
-                          ? `${product.duration.hours} jam`
-                          : product.duration.days
-                          ? `${product.duration.days} hari`
-                          : "-"}
-                      </li>
-                    )}
-                    <li>Harga: {product.currency} {product.price.toLocaleString()}</li>
-                  </ul>
-                  <div className="border-button mt-3">
-                    <Button variant="outline-primary" href="#program">Lihat Detail</Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                </div>
+              </div>
+            ))}
+        </div>
       </Container>
     </section>
   );

@@ -1,0 +1,95 @@
+.container {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  font-family: 'Inter', system-ui, sans-serif;
+  text-align: center;
+}
+
+.image {
+  width: 100%;
+  height: 260px;
+  background-color: #e2e8f0;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #1e293b;
+  margin: 0;
+}
+
+.price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2563eb; /* default color, bisa override di inline style */
+}
+
+.description {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.button {
+  padding: 0.75rem 0.4rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 0.55rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.addToCartButton {
+  background-color: #fbbf24;
+  color: #1e293b;
+  margin-right: 0.5rem;
+  flex: 1;
+}
+
+.checkoutButton {
+  background-color: #2563eb;
+  color: white;
+  flex: 1;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 600px) {
+  .container {
+    text-align: left;
+  }
+  .headerRow {
+    justify-content: flex-start;
+  }
+  .buttonGroup {
+    gap: 0.5rem;
+  }
+}

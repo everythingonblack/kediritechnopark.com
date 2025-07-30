@@ -1,0 +1,550 @@
+/* TechnoAcademyWebsite.module.css */
+
+/* Header */
+.modal {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.527);
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+.modalBody {
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.header {
+    background-color: white;
+    padding: 14px 6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    width: 130px;
+}
+
+.nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.navLink {
+    text-decoration: none;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+.navLinkHover {
+    color: #2563eb;
+}
+
+.authButtons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.searchButton,
+.userButton {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.loginButton {
+    background-color: transparent;
+    color: #64748b;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+}
+
+/* Hero Section */
+.hero {
+    background-image: url('https://academy.kediritechnopark.com/wp-content/uploads/2025/07/pexels-fauxels-3184360-scaled.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 0 2rem;
+    color: white;
+    position: relative;
+    border-radius: 0 0 0 60px;
+    text-align: left;
+    height: calc(100vh - 61.61px);
+    display: flex;
+}
+
+.heroContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.heroContent {
+    z-index: 2;
+}
+
+.heroTitle {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-top: 0px;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+}
+
+.heroDescription {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.joinButton {
+    background: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(30, 64, 175) 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.heroImage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.heroImagePlaceholder {
+    width: 500px;
+    height: 350px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+}
+
+.Section {
+    padding: 2rem 6rem;
+    background-color: #f8fafc;
+}
+
+.coursesContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.coursesTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 3rem;
+}
+
+.coursesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+.courseCard {
+    background-color: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    /* Tambahan untuk menghilangkan highlight biru */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    outline: none;
+}
+
+.courseCard:focus {
+    outline: none;
+}
+
+
+.courseCardHover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.courseImage {
+    width: 100%;
+    height: 200px;
+    background-color: #e2e8f0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.courseLabel {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #ef4444;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.courseContent {
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.courseCategory {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.courseTitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+
+.courseStats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.courseStat {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.coursePrice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.originalPrice {
+    text-decoration: line-through;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.currentPrice {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+.freePrice {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #059669;
+}
+
+.featuresContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.featuresTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 2rem;
+    margin-top: 0;
+    text-align: left;
+}
+
+.featuresDescription {
+    font-size: 1.1rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    text-align: left;
+    max-width: 800px;
+}
+
+.featuresList {
+    display: grid;
+    gap: 2rem;
+}
+
+.featureItem {
+    display: flex;
+    gap: 1.5rem;
+    background-color: #f8fafc;
+    border-radius: 1rem;
+    align-items: flex-start;
+}
+
+.featureIcon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.5rem;
+}
+
+.featureContent {
+    flex: 1;
+}
+
+.featureTitle {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #1e293b;
+    margin-top: 6px;
+    margin-bottom: 0.5rem;
+    text-align: left;
+}
+
+.featureDescription {
+    color: #64748b;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.ctaContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+}
+
+.ctaCard {
+    background-color: white;
+    padding: 3rem;
+    border-radius: 1rem;
+    text-align: center;
+    box-shadow: 10px 10px 10px rgb(0 0 0 / 15%);
+    transition: all 0.3s ease;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ctaIcon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 2rem;
+}
+
+.ctaTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.ctaDescription {
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.ctaButton {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+/* Footer */
+.footer {
+    background-color: #1e293b;
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.footerContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footerText {
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.socialLinks {
+    display: flex;
+    gap: 1rem;
+}
+
+.socialLink {
+    width: 40px;
+    height: 40px;
+    background-color: #374151;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.socialLink:hover {
+    background-color: #4b5563;
+}
+
+/* Responsive Styles */
+@media (max-width: 800px) {
+    .modalBody {
+        width: 80%;
+    }
+
+    .header {
+        padding: 14px 2rem;
+    }
+
+    .heroContainer {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .ctaTitle,
+    .courseTitle {
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .ctaDescription,
+    .courseContent p {
+        font-size: 13px;
+        margin: 6px 0px;
+    }
+
+    .ctaCard,
+    .Section {
+        padding: 2rem 0.8rem;
+        background-color: #f8fafc;
+    }
+
+    .courseContent {
+        text-align: left;
+        padding: 0.8rem;
+    }
+
+    .ctaContainer,
+    .coursesGrid {
+        grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+        gap: 0.8rem;
+    }
+
+    .featureTitle {
+        margin-top: 6px;
+        margin-bottom: 0.5rem;
+        text-align: left;
+    }
+
+    .featureDescription {
+        text-align: left;
+        margin-bottom: 0;
+    }
+
+    .featuresList {
+        gap: 0rem;
+    }
+
+    
+.ctaButton {
+    font-size: 12px;
+    padding: 1rem 1rem;
+    margin-top: 10px;
+}
+
+}
+
+
+
+@media (max-width: 600px) {
+    .nav {
+        display: none;
+    }
+}

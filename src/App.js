@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-// import './assets/css/templatemo-chain-app-dev.css'; // Assuming you copy your original CSS here
-// import './assets/css/animated.css';
-// import './assets/css/owl.css';
+import React, { useEffect, useState, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import styles from './components/Styles.module.css';
 
-// Import your converted React components
+// Import components
+import Login from './components/Login';
+
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import ServicesSection from './components/ServicesSection';
@@ -15,14 +15,70 @@ import KnowledgeBaseSection from './components/KnowledgeBaseSection';
 import ClientsSection from './components/ClientsSection';
 import Footer from './components/Footer';
 
+import ProductDetailPage from './components/ProductDetailPage';
+
+
+function HomePage({
+  hoveredCard,
+  setHoveredCard,
+  selectedProduct,
+  setSelectedProduct,
+  showedModal,
+  setShowedModal,
+  productSectionRef,
+  courseSectionRef
+}) {
+
+  return (
+    <>
+      <HeroSection />
+      <ServicesSection />
+      <ProductSection
+        productSectionRef={productSectionRef}
+        hoveredCard={hoveredCard}
+        setHoveredCard={setHoveredCard}
+        setSelectedProduct={setSelectedProduct}
+        setShowedModal={setShowedModal}
+      />
+      <AcademySection 
+        courseSectionRef={courseSectionRef}
+        hoveredCard={hoveredCard}
+        setHoveredCard={setHoveredCard}
+        setSelectedProduct={setSelectedProduct}
+        setShowedModal={setShowedModal} />
+      <AboutUsSection />
+      <KnowledgeBaseSection />
+      <ClientsSection />
+    </>
+  );
+}
+
 function App() {
   const [loading, setLoading] = useState(true);
 
+  // State yang diperlukan untuk HomePage
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState({});
+  const [showedModal, setShowedModal] = useState(null); // 'product' | 'login' | null
+  const [postLoginAction, setPostLoginAction] = useState(null);
+  
+  const [username, setUsername] = useState(null);
+
+  
+  const productSectionRef = useRef(null);
+  const courseSectionRef = useRef(null);
+
+  const scrollToProduct = () => {
+    productSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+  const scrollToCourse = () => {
+    courseSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   useEffect(() => {
-    // Simulate preloader and remove it after some time
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1000); // Adjust time as needed
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -42,28 +98,59 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <Header />
-      <HeroSection />
-      {/* FULL WIDTH IMAGE SECTION */}
-      {/* This can be a separate component or integrated into HeroSection */}
-      <div className="custom-image-section wow fadeInRight">
-        <a href="https://registration.kediritechnopark.com/" target="_blank" className="custom-image-link" rel="noopener noreferrer">
-          <div className="custom-image-wrapper">
-            <img src="/assets/images/FREE!.png" className="custom-image" />
-            <div className="light-glare"></div>
-          </div>
-        </a>
+    <Router>
+      <div className="App">
+        <Header username={username} scrollToProduct={scrollToProduct} scrollToCourse={scrollToCourse} setShowedModal={setShowedModal} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                hoveredCard={hoveredCard}
+                setHoveredCard={setHoveredCard}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                showedModal={showedModal}
+                setShowedModal={setShowedModal}
+                productSectionRef={productSectionRef}
+                courseSectionRef={courseSectionRef}
+              />
+            }
+          />
+        </Routes>
+        <Footer />
+          {/* Unified Modal */}
+            {showedModal && (
+                <div
+                    className={styles.modal}
+                    onClick={() => {
+                        setShowedModal(null);
+                        setSelectedProduct({});
+                    }}
+                >
+                    <div
+                        className={styles.modalBody}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {showedModal === 'product' && (
+                            <ProductDetailPage
+                                setPostLoginAction={setPostLoginAction}
+                                setShowedModal={setShowedModal}
+                                product={selectedProduct}
+                                onClose={() => {
+                                    setShowedModal(null);
+                                    setSelectedProduct({});
+                                }}
+                            />
+                        )}
+                        {showedModal === 'login' && (
+                            <Login postLoginAction={postLoginAction} setPostLoginAction={setPostLoginAction} onClose={() => setShowedModal(null)} />
+                        )}
+                    </div>
+                </div>
+            )}
       </div>
-
-      <ServicesSection />
-      <ProductSection />
-      <AcademySection />
-      <AboutUsSection />
-      <KnowledgeBaseSection />
-      <ClientsSection />
-      <Footer />
-    </div>
+    </Router>
   );
 }
 

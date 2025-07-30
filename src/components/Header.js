@@ -1,24 +1,72 @@
-import React from 'react';
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Header = () => {
+import { Navbar, Nav, Container } from 'react-bootstrap';
+import styles from './Styles.module.css';
+
+const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal }) => {
+  const navigate = useNavigate();
+  const [hoveredNav, setHoveredNav] = useState(null);
+
+
   return (
-    <Navbar bg="light" expand="lg" sticky="top">
-      <Container>
-        <Navbar.Brand href="#">Kediri Technopark</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link href="#top">Home</Nav.Link>
-            <Nav.Link href="#services">Services</Nav.Link>
-            <Nav.Link href="#produk">Product</Nav.Link>
-            <Nav.Link href="#academy">Academy</Nav.Link>
-            <Nav.Link href="#about">About</Nav.Link>
-            <Nav.Link href="#knowledge">Knowledge</Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+
+    <header className={styles.header}>
+      <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
+
+      <nav className={styles.nav}>
+       
+        <a
+          className={`${styles.navLink} ${hoveredNav === 2 ? styles.navLinkHover : ''}`}
+          onMouseEnter={() => setHoveredNav(2)}
+          onMouseLeave={() => setHoveredNav(null)}
+          onClick={() => {
+            if (username == null) {
+              scrollToProduct();
+            }
+            else {
+              navigate('/products');
+            }
+          }}
+        >
+          PRODUCTS
+        </a>
+        <a
+          className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
+          onMouseEnter={() => setHoveredNav(3)}
+          onMouseLeave={() => setHoveredNav(null)}
+          onClick={() => {
+            if (username == null) {
+              scrollToCourse();
+            }
+            else {
+              navigate('/courses');
+            }
+          }}
+        >
+          COURSES
+        </a>
+        <a
+          className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}
+          onMouseEnter={() => setHoveredNav(4)}
+          onMouseLeave={() => setHoveredNav(null)}
+        >
+          USER
+        </a>
+      </nav>
+
+      <div className={styles.authButtons}>
+        {username ? (
+          <span style={{ color: '#2563eb', fontWeight: '600' }}>
+            Halo, {username}
+          </span>
+        ) : (
+          <button className={styles.loginButton} onClick={() => setShowedModal('login')}>
+            LOGIN
+          </button>
+        )}
+      </div>
+    </header>
   );
 };
 
