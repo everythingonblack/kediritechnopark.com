@@ -3,7 +3,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 
 const HeroSection = () => {
   return (
-    <section className="hero-section py-5 bg-light">
+    <section className="hero-section pt-5 bg-light">
       <Container>
         <Row className="align-items-center">
           <Col lg={6}>
@@ -15,7 +15,7 @@ const HeroSection = () => {
             </div>
           </Col>
           <Col lg={6}>
-            <img src="/assets/images/gambar1.png" alt="Hero Image" className="img-fluid" />
+            <img src="https://kediritechnopark.com/assets/images/gambar1.png" alt="Hero Image" className="img-fluid" />
           </Col>
         </Row>
       </Container>

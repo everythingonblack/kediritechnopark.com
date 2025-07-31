@@ -21,7 +21,7 @@ const ProductSection = ({ hoveredCard, setHoveredCard, setSelectedProduct, setSh
 
   return (
 
-    <section id="services" className="services py-5">
+    <section id="services" className="services pt-5">
       <Container>
         <div className="section-heading text-center mb-4">
           <h4>OUR <em>PRODUCTS</em></h4>

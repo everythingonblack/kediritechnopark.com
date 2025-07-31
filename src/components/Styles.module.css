@@ -513,7 +513,7 @@
 
     .ctaContainer,
     .coursesGrid {
-        grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(173px, 1fr));
         gap: 0.8rem;
     }
 

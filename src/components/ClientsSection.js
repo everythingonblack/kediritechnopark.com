@@ -3,7 +3,7 @@ import { Container, Row, Col, Image } from 'react-bootstrap';
 
 const ClientsSection = () => {
   return (
-    <section id="clients" className="the-clients section py-5">
+    <section id="clients" className="the-clients section pt-5">
       <Container>
         <Row>
           <Col lg={{ span: 8, offset: 2 }}>

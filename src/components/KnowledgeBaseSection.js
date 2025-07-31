@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 
 const KnowledgeBaseSection = () => {
   return (
-    <section id="knowledge" className="knowledge section py-5">
+    <section id="knowledge" className="knowledge section pt-5">
       <Container>
         <Row>
           <Col lg={{ span: 8, offset: 2 }}>
