@@ -85,8 +85,8 @@ const ProductDetail = ({ product, setPostLoginAction, setShowedModal }) => {
       return;
     }
 
-    // Redirect dengan token dan itemsId di query
-    window.location.href = `http://localhost:3001/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/courses&redirect_failed=http://localhost:3000`;
+    // Redirect dengan token dan itemsId di query route ke checkout.kediritechnopark.com
+    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
   };
 
 
@@ -100,8 +100,8 @@ const ProductDetail = ({ product, setPostLoginAction, setShowedModal }) => {
       <div className={styles.headerRow}>
         <h2 className={styles.title}>{product.name}</h2>
         <div className={styles.price} style={{ color: priceColor }}>
-          {product.price === 0
-            ? 'Free'
+          {product.price == null
+            ? 'Pay-As-You-Go'
             : `Rp ${parseInt(product.price).toLocaleString('id-ID')}`}
         </div>
       </div>

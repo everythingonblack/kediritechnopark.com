@@ -21,15 +21,11 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal }) =
           onMouseEnter={() => setHoveredNav(2)}
           onMouseLeave={() => setHoveredNav(null)}
           onClick={() => {
-            if (username == null) {
-              scrollToProduct();
-            }
-            else {
-              navigate('/products');
-            }
+              navigate('/');
+            
           }}
         >
-          PRODUCTS
+          HOME
         </a>
         <a
           className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}

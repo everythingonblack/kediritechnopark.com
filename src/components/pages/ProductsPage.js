@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import ProductDetailPage from './ProductDetailPage';
-import Login from './Login';
-import styles from './Styles.module.css';
+import ProductDetailPage from '../ProductDetailPage';
+import Login from '../Login';
+import styles from '../Styles.module.css';
 
 // Fungsi simple untuk parsing token JWT dan mengembalikan payload JSON
 function parseJwt(token) {
@@ -90,7 +90,7 @@ const CoursePage = () => {
                                     onMouseLeave={() => setHoveredCard(null)}
                                 >
                                     <div className={styles.courseImage}>
-                                        {product.price === 0 && (
+                                        {product.price == 0 && (
                                             <span className={styles.courseLabel}>Free</span>
                                         )}
                                     </div>
@@ -100,12 +100,12 @@ const CoursePage = () => {
                                         <div className={styles.coursePrice}>
                                             <span
                                                 className={
-                                                    product.price === 0
+                                                    product.price == 0
                                                         ? styles.freePrice
                                                         : styles.currentPrice
                                                 }
                                             >
-                                                {product.price === 0
+                                                {product.price == 0
                                                     ? 'Free'
                                                     : `Rp ${product.price.toLocaleString('id-ID')}`}
                                             </span>

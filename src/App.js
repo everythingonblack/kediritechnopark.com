@@ -167,7 +167,7 @@ function App() {
             }
           />
           <Route
-            path="/"
+            path="/products"
             element={
               <ProductsPage/>
             }
