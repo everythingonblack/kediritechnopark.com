@@ -17,6 +17,9 @@ import Footer from './components/Footer';
 
 import ProductDetailPage from './components/ProductDetailPage';
 
+import ProductsPage from './components/pages/ProductsPage';
+
+
 
 function HomePage({
   hoveredCard,
@@ -52,6 +55,21 @@ function HomePage({
     </>
   );
 }
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -64,10 +82,41 @@ function App() {
   
   const [username, setUsername] = useState(null);
 
-  
   const productSectionRef = useRef(null);
   const courseSectionRef = useRef(null);
 
+    useEffect(() => {
+        // Ambil token dari cookies
+        const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
+        if (match) {
+            const token = match[2];
+
+            fetch('https://bot.kediritechnopark.com/webhook/user-dev/data', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+
+                },
+            })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data && data[0] && data[0].token) {
+                        // Update token with data[0].token
+                        document.cookie = `token=${data[0].token}; path=/`;
+                    } else {
+                        console.warn('Token tidak ditemukan dalam data.');
+                    }
+                })
+                .catch(err => console.error('Fetch error:', err));
+
+            const payload = parseJwt(token);
+            if (payload && payload.username) {
+                setUsername(payload.username);
+            }
+        }
+    }, []);
   const scrollToProduct = () => {
     productSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -115,6 +164,12 @@ function App() {
                 productSectionRef={productSectionRef}
                 courseSectionRef={courseSectionRef}
               />
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <ProductsPage/>
             }
           />
         </Routes>

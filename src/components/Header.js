@@ -40,11 +40,12 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal }) =
               scrollToCourse();
             }
             else {
-              navigate('/courses');
+              navigate('/products');
             }
           }}
         >
-          COURSES
+                      {username == null ? "PRODUCTS" : "MY PRODUCTS"}
+
         </a>
         <a
           className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}

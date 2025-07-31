@@ -95,7 +95,7 @@ const ProductDetail = ({ product, setPostLoginAction, setShowedModal }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.image} style={{ backgroundImage: `url(${product.image})` }}></div>
+      <div className={styles.image}>📦</div>
 
       <div className={styles.headerRow}>
         <h2 className={styles.title}>{product.name}</h2>

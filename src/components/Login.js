@@ -99,6 +99,7 @@ const LoginRegister = ({postLoginAction, setPostLoginAction}) => {
           postLoginAction(); // resume action (e.g., checkout)
           setPostLoginAction(null);
         }
+        window.location.reload()
       } else {
         alert('Token tidak ditemukan pada respons login');
       }
