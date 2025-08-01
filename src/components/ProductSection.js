@@ -6,18 +6,48 @@ import styles from './Styles.module.css';
 const ProductSection = ({ hoveredCard, setHoveredCard, setSelectedProduct, setShowedModal, productSectionRef }) => {
   const [products, setProducts] = useState([]);
 
-  useEffect(() => {
-    fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ type: 'product', onlyParents: true }),
+useEffect(() => {
+  fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ type: 'product' }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      const parentMap = {};
+      const childrenMap = {};
+
+      // Pisahkan parent dan child
+      data.forEach(product => {
+        if (product.sub_product_of) {
+          const parentId = product.sub_product_of;
+          if (!childrenMap[parentId]) childrenMap[parentId] = [];
+          childrenMap[parentId].push(product);
+        } else {
+          parentMap[product.id] = {
+            ...product,
+            children: []
+          };
+        }
+      });
+
+      // Pasang children ke parent
+      Object.keys(childrenMap).forEach(parentId => {
+        const parent = parentMap[parentId];
+        if (parent) {
+          parent.children = childrenMap[parentId];
+        }
+      });
+
+      // Ambil parent saja
+      const enrichedData = Object.values(parentMap);
+
+      setProducts(enrichedData);
     })
-      .then(res => res.json())
-      .then(data => setProducts(data))
-      .catch(err => console.error('Fetch error:', err));
-  }, []);
+    .catch(err => console.error('Fetch error:', err));
+}, []);
 
   return (
 
@@ -31,7 +61,8 @@ const ProductSection = ({ hoveredCard, setHoveredCard, setSelectedProduct, setSh
         <div className={styles.coursesGrid}>
           {products &&
             products[0]?.name &&
-            products.map(product => (
+            products
+            .map(product => (
               <div
                 key={product.id}
                 className={`${styles.courseCard} ${hoveredCard === product.id ? styles.courseCardHover : ''}`}

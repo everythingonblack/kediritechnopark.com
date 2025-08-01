@@ -3,7 +3,7 @@ import ProductDetailPage from '../ProductDetailPage';
 import Login from '../Login';
 import styles from '../Styles.module.css';
 
-// Fungsi simple untuk parsing token JWT dan mengembalikan payload JSON
+
 function parseJwt(token) {
     try {
         const base64Url = token.split('.')[1];
@@ -20,32 +20,122 @@ function parseJwt(token) {
     }
 }
 
+function getDistinctProductIdsFromJwt(token) {
+    const payload = parseJwt(token);
+    if (!payload || !payload.subscriptions || !payload.subscriptions) return [];
+
+    const productIds = payload.subscriptions.map(p => p.product_id);
+    return [...new Set(productIds)];
+}
+
+function getLatestEndDatesFromJwt(token) {
+    const payload = parseJwt(token);
+    if (!payload || !payload.subscriptions || !payload.subscriptions) return {};
+
+    const result = {};
+    payload.subscriptions.forEach(p => {
+        if (!p.end_date) return;
+        const id = p.product_id;
+        const endDate = new Date(p.end_date);
+        if (!result[id] || endDate > new Date(result[id])) {
+            result[id] = p.end_date;
+        }
+    });
+
+    return result;
+}
+function getTotalTokenFromJwt(token) {
+    const payload = parseJwt(token);
+    if (!payload || !payload.subscriptions || !payload.subscriptions) return {};
+
+    const tokenQuantities = {};
+    payload.subscriptions.forEach(p => {
+        // Pastikan ada quantity dan unit_type token
+        if (p.quantity && p.product_id) {
+            tokenQuantities[p.product_id] = (tokenQuantities[p.product_id] || 0) + p.quantity;
+        }
+    });
+
+    return tokenQuantities;
+}
+
+
 const CoursePage = () => {
     const [postLoginAction, setPostLoginAction] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState({});
     const [hoveredCard, setHoveredCard] = useState(null);
-    const [showedModal, setShowedModal] = useState(null); // 'product' | 'login' | null
+    const [showedModal, setShowedModal] = useState(null);
     const [products, setProducts] = useState([]);
+useEffect(() => {
+    const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
+    if (match) {
+        const token = match[2];
 
-    useEffect(() => {
-        // Ambil token dari cookies
-        const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
-        if (match) {
-            const token = match[2];
+        const productIds = getDistinctProductIdsFromJwt(token);
+        const endDates = getLatestEndDatesFromJwt(token);
+        const tokenQuantitiesFromJwt = getTotalTokenFromJwt(token);
 
-        fetch('https://bot.kediritechnopark.com/webhook/users-dev/my-products', {
+        fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
             },
-            body: JSON.stringify({ type: 'product' }),
+            body: JSON.stringify({ itemsId: productIds, type: 'product' }),
         })
             .then(res => res.json())
-            .then(data => setProducts(data))
-            .catch(err => console.error('Fetch error:', err));
+            .then(data => {
+                const parentMap = {};
+                const childrenMap = {};
+
+                data.forEach(product => {
+                    if (product.sub_product_of) {
+                        const parentId = product.sub_product_of;
+                        if (!childrenMap[parentId]) childrenMap[parentId] = [];
+                        childrenMap[parentId].push(product);
+                    } else {
+                        parentMap[product.id] = {
+                            ...product,
+                            quantity: product.quantity || 0,
+                            end_date: endDates[product.id] || null,
+                            children: []
+                        };
+                    }
+                });
+// ...
+
+Object.keys(childrenMap).forEach(parentId => {
+    const parent = parentMap[parentId];
+    const children = childrenMap[parentId];
+
+    if (parent) {
+        parent.children = children;
+
+        // Pakai quantity dari JWT langsung (tokenQuantitiesFromJwt)
+        parent.quantity = children.reduce((total, child) => {
+            return total + (tokenQuantitiesFromJwt[child.id] || 0);
+        }, 0);
+    }
+});
+
+// ...
+
+// Update quantity untuk produk yang bukan parent dan bukan anak
+Object.values(parentMap).forEach(product => {
+    if (!product.children.length) {
+        if (product.unit_type === 'token') {
+            product.quantity = tokenQuantitiesFromJwt[product.id] || 0;
         }
-    }, []);
+    }
+});
+
+                const enrichedData = Object.values(parentMap);
+                setProducts(enrichedData);
+                console.log(enrichedData);
+            })
+            .catch(err => console.error('Fetch error:', err));
+    }
+}, []);
+
 
     const features = [
         {
@@ -70,49 +160,52 @@ const CoursePage = () => {
 
     return (
         <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-         
+
             {/* Courses Section */}
             <section className={styles.Section}>
                 <div className={styles.coursesContainer}>
-                    <h2 className={styles.coursesTitle}>OUR COURSES</h2>
+                    <h2 className={styles.coursesTitle}>MY PRODUCTS</h2>
                     <div className={styles.coursesGrid}>
                         {products &&
                             products[0]?.name &&
-                            products.map(product => (
-                                <div
-                                    key={product.id}
-                                    className={`${styles.courseCard} ${hoveredCard === product.id ? styles.courseCardHover : ''}`}
-                                    onClick={() => {
-                                        setSelectedProduct(product);
-                                        setShowedModal('product');
-                                    }}
-                                    onMouseEnter={() => setHoveredCard(product.id)}
-                                    onMouseLeave={() => setHoveredCard(null)}
-                                >
-                                    <div className={styles.courseImage}>
-                                        {product.price == 0 && (
-                                            <span className={styles.courseLabel}>Free</span>
-                                        )}
-                                    </div>
-                                    <div className={styles.courseContent}>
-                                        <h3 className={styles.courseTitle}>{product.name}</h3>
-                                        <p className={styles.courseDesc}>{product.description}</p>
-                                        <div className={styles.coursePrice}>
-                                            <span
-                                                className={
-                                                    product.price == 0
-                                                        ? styles.freePrice
-                                                        : styles.currentPrice
-                                                }
-                                            >
-                                                {product.price == 0
-                                                    ? 'Free'
-                                                    : `Rp ${product.price.toLocaleString('id-ID')}`}
-                                            </span>
+                            products
+                                .map(product => (
+                                    <div
+                                        key={product.id}
+                                        className={`${styles.courseCard} ${hoveredCard === product.id ? styles.courseCardHover : ''}`}
+                                        onClick={() => {
+                                            setSelectedProduct(product);
+                                            setShowedModal('product');
+                                        }}
+                                        onMouseEnter={() => setHoveredCard(product.id)}
+                                        onMouseLeave={() => setHoveredCard(null)}
+                                    >
+                                        <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }}>
+                                            {product.price == 0 && (
+                                                <span className={styles.courseLabel}>Free</span>
+                                            )}
+                                        </div>
+                                        <div className={styles.courseContent}>
+                                            <h3 className={styles.courseTitle}>{product.name}</h3>
+                                            <p className={styles.courseDesc}>{product.description}</p>
+                                            <div className={styles.coursePrice}>
+                                                <span
+                                                    className={
+                                                        product.price == 0
+                                                            ? styles.freePrice
+                                                            : styles.currentPrice
+                                                    }
+                                                >
+                                                    {product.unit_type === 'duration'
+                                                        ? `Valid until: ${product.end_date ? new Date(product.end_date).toLocaleDateString() : 'N/A'}`
+                                                        : `SISA TOKEN ${product.quantity || 0}`
+                                                    }
+
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                     </div>
                 </div>
             </section>

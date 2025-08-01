@@ -105,16 +105,17 @@ function App() {
                     if (data && data[0] && data[0].token) {
                         // Update token with data[0].token
                         document.cookie = `token=${data[0].token}; path=/`;
+                        
+            const payload = parseJwt(token);
+            if (payload && payload.username) {
+                setUsername(payload.username);
+            }
                     } else {
                         console.warn('Token tidak ditemukan dalam data.');
                     }
                 })
                 .catch(err => console.error('Fetch error:', err));
 
-            const payload = parseJwt(token);
-            if (payload && payload.username) {
-                setUsername(payload.username);
-            }
         }
     }, []);
   const scrollToProduct = () => {
