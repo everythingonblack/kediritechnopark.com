@@ -62,39 +62,41 @@ const CoursePage = ({ subscriptions }) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ itemsId: productIds, type: 'product' }),
+            body: JSON.stringify({ itemsId: productIds }),
         })
             .then(res => res.json())
             .then(data => {
                 const enrichedData = Object.values(groupedSubs)
-    .filter(group => data.some(p => p.id === group.product_id)) // ✅ hanya produk yang ada di metadata
-    .map(group => {
-        const productData = data.find(p => p.id == group.product_id);
+                    .filter(group => data.some(p => p.id === group.product_id)) // ✅ hanya produk yang ada di metadata
+                    .map(group => {
+                        const productData = data.find(p => p.id == group.product_id);
 
-        // Cek fallback image dari parent jika image kosong dan sub_product_of ada
-        let image = productData?.image || '';
-        if (!image && productData?.sub_product_of) {
-            const parent = data.find(p => p.id === productData.sub_product_of);
-            image = parent?.image || '';
-        }
+                        // Cek fallback image dari parent jika image kosong dan sub_product_of ada
+                        let image = productData?.image || '';
+                        let description = productData?.description || '';
+                        if (!image && productData?.sub_product_of) {
+                            const parent = data.find(p => p.id === productData.sub_product_of);
+                            image = parent?.image || '';
+                            description = parent?.description || '';
+                        }
 
-        return {
-            id: group.product_id,
-            name: group.product_name,
-            type: productData?.type || 'product',
-            image: image,
-            description: productData?.description || '',
-            price: productData?.price || 0,
-            currency: productData?.currency || 'IDR',
-            duration: productData?.duration || {},
-            sub_product_of: productData?.sub_product_of || null,
-            is_visible: productData?.is_visible ?? true,
-            unit_type: productData?.unit_type || group.unit_type,
-            quantity: group.quantity,
-            end_date: group.end_date,
-            children: []
-        };
-    });
+                        return {
+                            id: group.product_id,
+                            name: group.product_name,
+                            type: productData?.type || 'product',
+                            image: image,
+                            description: description,
+                            price: productData?.price || 0,
+                            currency: productData?.currency || 'IDR',
+                            duration: productData?.duration || {},
+                            sub_product_of: productData?.sub_product_of || null,
+                            is_visible: productData?.is_visible ?? true,
+                            unit_type: productData?.unit_type || group.unit_type,
+                            quantity: group.quantity,
+                            end_date: group.end_date,
+                            children: []
+                        };
+                    });
 
                 console.log(enrichedData)
                 setProducts(enrichedData);

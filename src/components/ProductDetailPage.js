@@ -33,49 +33,54 @@ const ProductDetail = ({ subscriptions, product, setPostLoginAction, setShowedMo
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
 
     if (!token) {
-      setPostLoginAction(() => () => onCheckout());
+      setPostLoginAction(() => () => setShowedModal('product'));
       setShowedModal('login');
       return;
     }
     if (product.type == 'product') {
-
-
       const hasMatchingSubscription = Array.isArray(subscriptions) &&
-        subscriptions.some(sub =>
-          sub.product_name?.toLowerCase().includes(product.name.toLowerCase())
-        );
+  subscriptions.some(sub =>
+    sub.product_id === product.id || sub.product_parent_id === product.id
+  );
 
+// Always show children selector first if product has children
+if (product.children && product.children.length > 0) {
+  setShowChildSelector(true);
 
-      // Always show children selector first if product has children
-      if (product.children && product.children.length > 0) {
-        setShowChildSelector(true);
+  if (hasMatchingSubscription) {
+    const matching = subscriptions.filter(sub =>
+      sub.product_id === product.id || sub.product_parent_id === product.id
+    );
 
-        if (hasMatchingSubscription) {
-          const matching = subscriptions.filter(sub =>
-            sub.product_name?.toLowerCase().includes(product.name.toLowerCase())
-          );
-          const uniqueByName = Array.from(new Map(matching.map(sub => [sub.product_name, sub])).values());
+    if (matching.length > 0) {
+      // ✅ Select only the first for each product_name
+      const uniqueByName = Array.from(
+        new Map(matching.map(sub => [sub.product_name, sub])).values()
+      );
 
-          if (uniqueByName.length > 0) {
-            setMatchingSubscriptions(uniqueByName);
-          }
-        }
-        return;
-      }
+      setMatchingSubscriptions(uniqueByName);
+    }
+  }
+  return;
+}
 
-      // No children, but has subscription match
-      if (hasMatchingSubscription) {
-        const matching = subscriptions.filter(sub =>
-          sub.product_name?.toLowerCase().includes(product.name.toLowerCase())
-        );
-        const uniqueByName = Array.from(new Map(matching.map(sub => [sub.product_name, sub])).values());
+// No children, but has subscription match
+if (hasMatchingSubscription) {
+  const matching = subscriptions.filter(sub =>
+    sub.product_id === product.id || sub.product_parent_id === product.id
+  );
 
-        if (uniqueByName.length > 0) {
-          setMatchingSubscriptions(uniqueByName);
-          setShowSubscriptionSelector(true);
-          return;
-        }
-      }
+  if (matching.length > 0) {
+    const uniqueByName = Array.from(
+      new Map(matching.map(sub => [sub.product_name, sub])).values()
+    );
+
+    setMatchingSubscriptions(uniqueByName);
+    setShowSubscriptionSelector(true);
+    return;
+  }
+}
+
 
     }
     // No children, no matching subscription
