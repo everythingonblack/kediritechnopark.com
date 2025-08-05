@@ -3,78 +3,60 @@ import ProductDetailPage from '../ProductDetailPage';
 import Login from '../Login';
 import styles from '../Styles.module.css';
 
-
-function parseJwt(token) {
-    try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-        return JSON.parse(jsonPayload);
-    } catch (e) {
-        return null;
-    }
-}
-
-function getDistinctProductIdsFromJwt(token) {
-    const payload = parseJwt(token);
-    if (!payload || !payload.subscriptions || !payload.subscriptions) return [];
-
-    const productIds = payload.subscriptions.map(p => p.product_id);
-    return [...new Set(productIds)];
-}
-
-function getLatestEndDatesFromJwt(token) {
-    const payload = parseJwt(token);
-    if (!payload || !payload.subscriptions || !payload.subscriptions) return {};
-
-    const result = {};
-    payload.subscriptions.forEach(p => {
-        if (!p.end_date) return;
-        const id = p.product_id;
-        const endDate = new Date(p.end_date);
-        if (!result[id] || endDate > new Date(result[id])) {
-            result[id] = p.end_date;
-        }
-    });
-
-    return result;
-}
-function getTotalTokenFromJwt(token) {
-    const payload = parseJwt(token);
-    if (!payload || !payload.subscriptions || !payload.subscriptions) return {};
-
-    const tokenQuantities = {};
-    payload.subscriptions.forEach(p => {
-        // Pastikan ada quantity dan unit_type token
-        if (p.quantity && p.product_id) {
-            tokenQuantities[p.product_id] = (tokenQuantities[p.product_id] || 0) + p.quantity;
-        }
-    });
-
-    return tokenQuantities;
-}
-
-
-const CoursePage = () => {
+const CoursePage = ({ subscriptions }) => {
     const [postLoginAction, setPostLoginAction] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState({});
     const [hoveredCard, setHoveredCard] = useState(null);
     const [showedModal, setShowedModal] = useState(null);
     const [products, setProducts] = useState([]);
-useEffect(() => {
-    const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
-    if (match) {
-        const token = match[2];
 
-        const productIds = getDistinctProductIdsFromJwt(token);
-        const endDates = getLatestEndDatesFromJwt(token);
-        const tokenQuantitiesFromJwt = getTotalTokenFromJwt(token);
+    useEffect(() => {
+        if (!subscriptions) return;
 
+        // Step 1: Group subscriptions by product_name
+        function groupSubscriptionsByProductName(subs) {
+            const result = {};
+            subs.forEach(sub => {
+                const name = sub.product_name;
+                const productId = sub.product_id;
+                if (!result[name]) {
+                    result[name] = {
+                        product_id: productId,
+                        product_name: name,
+                        unit_type: sub.unit_type,
+                        end_date: sub.end_date,
+                        quantity: 0,
+                        subscriptions: []
+                    };
+                }
+
+                // Update end_date jika lebih baru
+                const currentEnd = new Date(result[name].end_date);
+                const thisEnd = new Date(sub.end_date);
+                if (thisEnd > currentEnd) {
+                    result[name].end_date = sub.end_date;
+                }
+
+                // Tambahkan quantity jika unit_type adalah 'token'
+                if (sub.unit_type == 'token') {
+                    result[name].quantity += sub.quantity ?? 0;
+                } else {
+                    result[name].quantity += 1; // Bisa diabaikan atau tetap hitung 1 per subscription
+                }
+
+                result[name].subscriptions.push(sub);
+
+            });
+
+            return result;
+        }
+
+        const groupedSubs = groupSubscriptionsByProductName(subscriptions);
+
+        // Step 2: Ambil semua unique product_id (tetap diperlukan untuk ambil metadata dari API)
+        const productIds = [...new Set(subscriptions.map(s => s.product_id))];
+
+        // Step 3: Fetch product metadata
         fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
             method: 'POST',
             headers: {
@@ -84,57 +66,33 @@ useEffect(() => {
         })
             .then(res => res.json())
             .then(data => {
-                const parentMap = {};
-                const childrenMap = {};
+                const enrichedData = Object.values(groupedSubs).map(group => {
+                    const productData = data.find(p => p.id == group.product_id);
 
-                data.forEach(product => {
-                    if (product.sub_product_of) {
-                        const parentId = product.sub_product_of;
-                        if (!childrenMap[parentId]) childrenMap[parentId] = [];
-                        childrenMap[parentId].push(product);
-                    } else {
-                        parentMap[product.id] = {
-                            ...product,
-                            quantity: product.quantity || 0,
-                            end_date: endDates[product.id] || null,
-                            children: []
-                        };
-                    }
+                    return {
+                        id: group.product_id,
+                        name: group.product_name,
+                        type: productData?.type || 'product',
+                        image: productData?.image || '',
+                        description: productData?.description || '',
+                        price: productData?.price || 0,
+                        currency: productData?.currency || 'IDR',
+                        duration: productData?.duration || {},
+                        sub_product_of: productData?.sub_product_of || null,
+                        is_visible: productData?.is_visible ?? true,
+                        unit_type: productData?.unit_type || group.unit_type,
+                        quantity: group.quantity, // Bisa diganti dengan jumlah token kalau diperlukan
+                        end_date: group.end_date,
+                        children: [] // Kosong, bisa diisi jika ada sub-product
+                    };
                 });
-// ...
-
-Object.keys(childrenMap).forEach(parentId => {
-    const parent = parentMap[parentId];
-    const children = childrenMap[parentId];
-
-    if (parent) {
-        parent.children = children;
-
-        // Pakai quantity dari JWT langsung (tokenQuantitiesFromJwt)
-        parent.quantity = children.reduce((total, child) => {
-            return total + (tokenQuantitiesFromJwt[child.id] || 0);
-        }, 0);
-    }
-});
-
-// ...
-
-// Update quantity untuk produk yang bukan parent dan bukan anak
-Object.values(parentMap).forEach(product => {
-    if (!product.children.length) {
-        if (product.unit_type === 'token') {
-            product.quantity = tokenQuantitiesFromJwt[product.id] || 0;
-        }
-    }
-});
-
-                const enrichedData = Object.values(parentMap);
+                console.log(enrichedData)
                 setProducts(enrichedData);
-                console.log(enrichedData);
+                console.log('Enriched Data:', enrichedData);
             })
             .catch(err => console.error('Fetch error:', err));
-    }
-}, []);
+    }, [subscriptions]);
+
 
 
     const features = [
@@ -171,19 +129,19 @@ Object.values(parentMap).forEach(product => {
                             products
                                 .map(product => (
                                     <div
-                                        key={product.id}
-                                        className={`${styles.courseCard} ${hoveredCard === product.id ? styles.courseCardHover : ''}`}
+                                        key={product.name}
+                                        className={`${styles.courseCard} ${hoveredCard === product.name ? styles.courseCardHover : ''}`}
                                         onClick={() => {
                                             setSelectedProduct(product);
                                             setShowedModal('product');
                                         }}
-                                        onMouseEnter={() => setHoveredCard(product.id)}
+                                        onMouseEnter={() => setHoveredCard(product.name)}
                                         onMouseLeave={() => setHoveredCard(null)}
                                     >
                                         <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }}>
-                                            {product.price == 0 && (
+                                            {/* {product.price == 0 && (
                                                 <span className={styles.courseLabel}>Free</span>
-                                            )}
+                                            )} */}
                                         </div>
                                         <div className={styles.courseContent}>
                                             <h3 className={styles.courseTitle}>{product.name}</h3>

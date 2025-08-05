@@ -1,29 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { Navbar, Nav, Container } from 'react-bootstrap';
 import styles from './Styles.module.css';
 
-const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal }) => {
+const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, handleLogout }) => {
   const navigate = useNavigate();
   const [hoveredNav, setHoveredNav] = useState(null);
-
+  const [menuOpen, setMenuOpen] = useState(false); // toggle mobile menu
 
   return (
-
     <header className={styles.header}>
       <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
 
+      {/* Desktop Navigation */}
       <nav className={styles.nav}>
-       
         <a
           className={`${styles.navLink} ${hoveredNav === 2 ? styles.navLinkHover : ''}`}
           onMouseEnter={() => setHoveredNav(2)}
           onMouseLeave={() => setHoveredNav(null)}
-          onClick={() => {
-              navigate('/');
-            
-          }}
+          onClick={() => navigate('/')}
         >
           HOME
         </a>
@@ -32,16 +26,11 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal }) =
           onMouseEnter={() => setHoveredNav(3)}
           onMouseLeave={() => setHoveredNav(null)}
           onClick={() => {
-            if (username == null) {
-              scrollToCourse();
-            }
-            else {
-              navigate('/products');
-            }
+            if (!username) scrollToCourse();
+            else navigate('/products');
           }}
         >
-                      {username == null ? "PRODUCTS" : "MY PRODUCTS"}
-
+          {username ? 'MY PRODUCTS' : 'PRODUCTS'}
         </a>
         <a
           className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}
@@ -52,12 +41,54 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal }) =
         </a>
       </nav>
 
+      {/* Burger Menu Button */}
+      <div className={styles.burger} onClick={() => setMenuOpen(!menuOpen)}>
+        ☰
+      </div>
+
+      {/* Mobile Dropdown Menu */}
+      {menuOpen && (
+        <div className={styles.mobileMenu}>
+          {username ? (
+            <>
+              <div className={styles.username}>Halo, {username}</div>
+
+              <button className={styles.logoutButton} onClick={() => {
+                 navigate('/products');
+              }}>
+                MY PRODUCTS
+              </button>
+
+              <button className={styles.logoutButton} onClick={() => {
+                setMenuOpen(false);
+                handleLogout();
+              }}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              className={styles.loginButton}
+              onClick={() => {
+                setMenuOpen(false);
+                setShowedModal('login');
+              }}
+            >
+              LOGIN
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Desktop Auth Buttons */}
       <div className={styles.authButtons}>
-        {username ? (
-          <span style={{ color: '#2563eb', fontWeight: '600' }}>
-            Halo, {username}
-          </span>
-        ) : (
+        {username && (
+          <div className={styles.loggedInContainer}>
+            <span className={styles.username}>Halo, {username}</span>
+            <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
+          </div>
+        )}
+        {!username && (
           <button className={styles.loginButton} onClick={() => setShowedModal('login')}>
             LOGIN
           </button>

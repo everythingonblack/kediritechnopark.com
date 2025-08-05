@@ -1,241 +1,286 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styles from './ProductDetail.module.css';
 
-const ProductDetail = ({ product, setPostLoginAction, setShowedModal }) => {
-  const [inCart, setInCart] = useState(false);
+const ProductDetail = ({ subscriptions, product, setPostLoginAction, setShowedModal }) => {
   const [showChildSelector, setShowChildSelector] = useState(false);
   const [selectedChildIds, setSelectedChildIds] = useState([]);
 
-  useEffect(() => {
-    const existingCookie = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('itemsId='));
-    let items = [];
-    if (existingCookie) {
-      try {
-        const value = decodeURIComponent(existingCookie.split('=')[1]);
-        items = JSON.parse(value);
-        if (!Array.isArray(items)) items = [];
-      } catch (e) {
-        items = [];
-      }
+  const [matchingSubscriptions, setMatchingSubscriptions] = useState([]);
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(null);
+  const [showSubscriptionSelector, setShowSubscriptionSelector] = useState(false);
+
+  const [showNamingInput, setShowNamingInput] = useState(false);
+  const [customName, setCustomName] = useState('');
+
+  const parseJWT = (token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
     }
-    setInCart(items.includes(product.id));
-  }, [product.id]);
-
-  const onSetCart = () => {
-    const existingCookie = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('itemsId='));
-
-    let items = [];
-
-    if (existingCookie) {
-      try {
-        const value = decodeURIComponent(existingCookie.split('=')[1]);
-        items = JSON.parse(value);
-        if (!Array.isArray(items)) items = [];
-      } catch (e) {
-        items = [];
-      }
-    }
-
-    let updatedItems;
-    if (items.includes(product.id)) {
-      updatedItems = items.filter(id => id !== product.id); // remove
-      setInCart(false);
-    } else {
-      updatedItems = [...items, product.id]; // add
-      setInCart(true);
-    }
-
-    document.cookie = `itemsId=${JSON.stringify(updatedItems)}; path=/; max-age=${7 * 24 * 60 * 60}`;
   };
 
-const onCheckout = () => {
-  const tokenCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('token='));
-  const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+  const onCheckout = () => {
+    const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+    const token = tokenCookie ? tokenCookie.split('=')[1] : '';
 
-  if (!tokenCookie) {
-    setPostLoginAction(() => () => onCheckout());
-    setShowedModal('login');
-    return;
-  }
-
-  // Jika punya children, tampilkan pilihan
-  if (product.children && product.children.length > 0) {
-    setShowChildSelector(true);
-    return;
-  }
-
-  // Ambil itemsId dari cookie
-  const itemsCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('itemsId='));
-
-  let items = [];
-  if (itemsCookie) {
-    try {
-      items = JSON.parse(itemsCookie.split('=')[1]);
-      if (!Array.isArray(items)) items = [];
-    } catch (e) {
-      items = [];
+    if (!token) {
+      setPostLoginAction(() => () => onCheckout());
+      setShowedModal('login');
+      return;
     }
-  }
+    if (product.type == 'product') {
 
-  // Tambahkan product.id jika belum ada
-  if (!items.includes(product.id)) {
-    items.push(product.id);
-  }
 
-  const itemsParam = JSON.stringify(items);
+      const hasMatchingSubscription = Array.isArray(subscriptions) &&
+        subscriptions.some(sub =>
+          sub.product_name?.toLowerCase().includes(product.name.toLowerCase())
+        );
 
-  window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
-};
 
-const onConfirmChildren = () => {
-  const tokenCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('token='));
-  const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+      // Always show children selector first if product has children
+      if (product.children && product.children.length > 0) {
+        setShowChildSelector(true);
 
-  if (selectedChildIds.length === 0) {
-    alert('Pilih minimal satu produk');
-    return;
-  }
+        if (hasMatchingSubscription) {
+          const matching = subscriptions.filter(sub =>
+            sub.product_name?.toLowerCase().includes(product.name.toLowerCase())
+          );
+          const uniqueByName = Array.from(new Map(matching.map(sub => [sub.product_name, sub])).values());
 
-  // Ambil itemsId dari cookie
-  const itemsCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('itemsId='));
+          if (uniqueByName.length > 0) {
+            setMatchingSubscriptions(uniqueByName);
+          }
+        }
+        return;
+      }
 
-  let items = [];
-  if (itemsCookie) {
-    try {
-      items = JSON.parse(itemsCookie.split('=')[1]);
-      if (!Array.isArray(items)) items = [];
-    } catch (e) {
-      items = [];
+      // No children, but has subscription match
+      if (hasMatchingSubscription) {
+        const matching = subscriptions.filter(sub =>
+          sub.product_name?.toLowerCase().includes(product.name.toLowerCase())
+        );
+        const uniqueByName = Array.from(new Map(matching.map(sub => [sub.product_name, sub])).values());
+
+        if (uniqueByName.length > 0) {
+          setMatchingSubscriptions(uniqueByName);
+          setShowSubscriptionSelector(true);
+          return;
+        }
+      }
+
     }
-  }
+    // No children, no matching subscription
+    const itemsParam = JSON.stringify([product.id]);
+    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+  };
 
-  // Gabungkan items dari cookie dengan selectedChildIds
-  const mergedItems = Array.from(new Set([...items, ...selectedChildIds]));
+  const onConfirmChildren = () => {
+    if (matchingSubscriptions.length > 0) {
+      setShowChildSelector(false);
+      setShowSubscriptionSelector(true);
+      return;
+    }
 
-  const itemsParam = JSON.stringify(mergedItems);
+    const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+    const token = tokenCookie ? tokenCookie.split('=')[1] : '';
 
-  window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
-};
+    if (selectedChildIds.length === 0) {
+      alert('Pilih minimal satu produk');
+      return;
+    }
 
+    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
+    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+  };
+
+  const onFinalCheckoutNewProduct = () => {
+    if (!customName.trim()) {
+      alert('Nama produk tidak boleh kosong');
+      return;
+    }
+
+    const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+    const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
+    const encodedName = encodeURIComponent(customName.trim());
+
+    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&new_name=${encodedName}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+  };
+
+  const onConfirmSelector = () => {
+    if (selectedSubscriptionId == null) {
+      alert('Pilih salah satu langganan.');
+      return;
+    }
+
+    if (selectedSubscriptionId === product.id) {
+      setShowNamingInput(true);
+    } else {
+      const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+      const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+      const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
+      const selectedSubscription = matchingSubscriptions.find(
+        (sub) => sub.id === selectedSubscriptionId
+      );
+      
+      const productName = selectedSubscription?.product_name;
+      const encodedName = encodeURIComponent(productName);
+
+      window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&set_name=${encodedName}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+    }
+  };
 
   const priceColor = product.price === 0 ? '#059669' : '#2563eb';
 
   return (
     <div className={styles.container}>
-
-      {/* ✅ Tampilan utama disembunyikan jika sedang memilih child */}
-      {!showChildSelector && (
+      {!showChildSelector && !showSubscriptionSelector && !showNamingInput && (
         <>
-          <div
-            className={styles.image}
-            style={{ backgroundImage: `url(${product.image})` }}
-          ></div>
-
+          <div className={styles.image} style={{ backgroundImage: `url(${product.image})` }}></div>
           <div className={styles.headerRow}>
             <h2 className={styles.title}>{product.name}</h2>
             <div className={styles.price} style={{ color: priceColor }}>
-              {product.price == null
-                ? 'Pay-As-You-Go'
-                : `Rp ${parseInt(product.price).toLocaleString('id-ID')}`}
+              {product.price == null ? 'Pay-As-You-Go' : `Rp ${parseInt(product.price).toLocaleString('id-ID')}`}
             </div>
           </div>
-
           <p className={styles.description}>{product.description}</p>
-
           <div className={styles.buttonGroup}>
-            <button
-              className={`${styles.button} ${styles.addToCartButton}`}
-              onClick={onSetCart}
-              onMouseOver={e => (e.target.style.backgroundColor = '#facc15')}
-              onMouseOut={e => (e.target.style.backgroundColor = '#fbbf24')}
-            >
-              <img
-                src={'/cart-shopping-svgrepo-com.svg'}
-                alt={inCart ? 'Hapus' : 'Tambah'}
-                style={{ width: '21px', height: '21px', marginRight: '7px' }}
-              />
-              {inCart ? 'Hapus' : 'Tambah'}
-            </button>
-
-            <button
-              className={`${styles.button} ${styles.checkoutButton}`}
-              onClick={onCheckout}
-              onMouseOver={e => (e.target.style.backgroundColor = '#1d4ed8')}
-              onMouseOut={e => (e.target.style.backgroundColor = '#2563eb')}
-            >
+            <button className={`${styles.button} ${styles.checkoutButton}`} onClick={onCheckout}>
               Checkout
             </button>
           </div>
         </>
       )}
 
-      {/* ✅ UI pemilihan child */}
       {showChildSelector && (
         <div className={styles.childSelector}>
           <h3>Pilih Paket</h3>
           {product.children.map(child => (
-            <label key={child.id} className={styles.childProduct} style={{ display: 'block', marginBottom: '8px' }}>
+            <label key={child.id} className={styles.childProduct}>
               <input
                 type="checkbox"
                 value={child.id}
                 checked={selectedChildIds.includes(child.id)}
                 onChange={e => {
                   const checked = e.target.checked;
-                  if (checked) {
-                    setSelectedChildIds(prev => [...prev, child.id]);
-                  } else {
-                    setSelectedChildIds(prev => prev.filter(id => id !== child.id));
-                  }
+                  setSelectedChildIds(prev =>
+                    checked ? [...prev, child.id] : prev.filter(id => id !== child.id)
+                  );
                 }}
               />
-              {' '}
-              {child.name} — Rp {parseInt(child.price || 0).toLocaleString('id-ID')}
+              &nbsp;{child.name} — Rp {parseInt(child.price || 0).toLocaleString('id-ID')}
             </label>
           ))}
-
-          <p style={{ marginTop: '10px' }}>
-            <strong>Total Harga:</strong>{' '}
-            Rp {selectedChildIds
-              .map(id => {
-                const found = product.children.find(child => child.id === id);
-                return found ? found.price || 0 : 0;
-              })
+          <p>
+            <strong>Total Harga:</strong> Rp {selectedChildIds
+              .map(id => product.children.find(child => child.id === id)?.price || 0)
               .reduce((a, b) => a + b, 0)
               .toLocaleString('id-ID')}
           </p>
-
           <div className={styles.buttonGroup}>
-            
-            <button
-              className={`${styles.button} ${styles.cancelButton}`}
-              onClick={() => {
-                setShowChildSelector(false);
-                setSelectedChildIds([]);
-              }}
-            >
+            <button className={styles.button} onClick={() => setShowChildSelector(false)}>
               Kembali
             </button>
-            <button
-              className={`${styles.button} ${styles.confirmButton}`}
-              onClick={onConfirmChildren}
-            >
+            <button className={styles.button} onClick={onConfirmChildren}>
               Lanjut ke Checkout
             </button>
           </div>
         </div>
       )}
+
+      {showSubscriptionSelector && !showNamingInput && (
+        <div className={styles.childSelector}>
+          <h5>Perpanjang {product.name}</h5>
+          {matchingSubscriptions.map(sub => (
+            <label key={sub.id} className={styles.childProduct}>
+              <input
+                type="radio"
+                name="subscription"
+                value={sub.id}
+                checked={selectedSubscriptionId == sub.id}
+                onChange={() => { setSelectedSubscriptionId(sub.id); setCustomName(sub.product_name) }}
+              />
+              &nbsp;{sub.product_name}
+            </label>
+          ))}
+          <h6>Atau buat baru</h6>
+          <label className={styles.childProduct}>
+            <input
+              type="radio"
+              name="subscription"
+              checked={selectedSubscriptionId === product.id}
+              onChange={() => setSelectedSubscriptionId(product.id)}
+            />
+            &nbsp;Buat {product.name} baru
+          </label>
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={() => setShowSubscriptionSelector(false)}>
+              Kembali
+            </button>
+            <button className={styles.button} onClick={onConfirmSelector}>
+              Lanjut ke Checkout
+            </button>
+          </div>
+        </div>
+      )}
+
+{showNamingInput && (
+  <div className={styles.childSelector}>
+    <h5>Buat {product.name} Baru</h5>
+    <input
+      type="text"
+      placeholder="Nama produk..."
+      className={styles.input}
+      value={customName}
+      onChange={(e) => setCustomName(e.target.value)}
+      style={{ width: '100%', padding: '8px', marginBottom: '16px', borderRadius: '10px' }}
+    />
+
+    {
+      matchingSubscriptions.some(
+        (sub) => sub.product_name === `${product.name}@${customName}`
+      ) && (
+        <p style={{ color: 'red', marginBottom: '10px' }}>
+          Nama produk sudah digunakan.
+        </p>
+      )
+    }
+
+    <div className={styles.buttonGroup}>
+      <button
+        className={styles.button}
+        onClick={() => {
+          setShowNamingInput(false);
+          setShowSubscriptionSelector(true);
+        }}
+      >
+        Kembali
+      </button>
+      <button
+        className={styles.button}
+        onClick={onFinalCheckoutNewProduct}
+        disabled={
+          customName.trim() === '' ||
+          matchingSubscriptions.some(
+            (sub) => sub.product_name === `${product.name}@${customName}`
+          )
+        }
+      >
+        Checkout
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
