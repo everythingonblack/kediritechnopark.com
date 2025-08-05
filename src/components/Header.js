@@ -32,13 +32,6 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
         >
           {username ? 'MY PRODUCTS' : 'PRODUCTS'}
         </a>
-        <a
-          className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}
-          onMouseEnter={() => setHoveredNav(4)}
-          onMouseLeave={() => setHoveredNav(null)}
-        >
-          USER
-        </a>
       </nav>
 
       {/* Burger Menu Button */}
@@ -51,7 +44,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
         <div className={styles.mobileMenu}>
           {username ? (
             <>
-              <div className={styles.username}>Halo, {username}</div>
+              <div className={styles.username}>{username}</div>
 
               <button className={styles.logoutButton} onClick={() => {
                  navigate('/products');
@@ -84,7 +77,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
       <div className={styles.authButtons}>
         {username && (
           <div className={styles.loggedInContainer}>
-            <span className={styles.username}>Halo, {username}</span>
+            <span className={styles.username}>{username}</span>
             <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
           </div>
         )}
