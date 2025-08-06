@@ -194,14 +194,14 @@
     box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     cursor: pointer;
-
-    /* Tambahan untuk menghilangkan highlight biru */
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
     outline: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
 }
 
 .courseCard:focus {
@@ -241,8 +241,20 @@
     font-weight: 600;
 }
 
-.courseContent {
-    padding: 1.5rem;
+.courseContentTop {
+    padding: 1rem 1rem 0rem;
+    text-align: left;
+}
+
+.courseContentTop p {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+
+.courseContentBottom {
+    padding: 1rem;
+    padding-top: 0;
     text-align: left;
 }
 
@@ -490,13 +502,11 @@
 
     .ctaTitle,
     .courseTitle {
-        font-size: 15px;
         margin: 0;
     }
 
     .ctaDescription,
-    .courseContent p {
-        font-size: 13px;
+    .courseContentTop, .courseContentBottom p {
         margin: 6px 0px;
     }
 
@@ -506,9 +516,8 @@
         background-color: #f8fafc;
     }
 
-    .courseContent {
+    .courseContentTop, .courseContentBottom {
         text-align: left;
-        padding: 0.8rem;
     }
 
     .ctaContainer,

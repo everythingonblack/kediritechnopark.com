@@ -2,9 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styles from './components/Styles.module.css';
 
-// Import components
 import Login from './components/Login';
-
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import ServicesSection from './components/ServicesSection';
@@ -14,13 +12,11 @@ import AboutUsSection from './components/AboutUsSection';
 import KnowledgeBaseSection from './components/KnowledgeBaseSection';
 import ClientsSection from './components/ClientsSection';
 import Footer from './components/Footer';
-
 import ProductDetailPage from './components/ProductDetailPage';
-
 import Dashboard from './components/Dashboard';
 import ProductsPage from './components/pages/ProductsPage';
 
-
+import processProducts from './helper/processProducts';
 
 function HomePage({
   hoveredCard,
@@ -32,7 +28,6 @@ function HomePage({
   productSectionRef,
   courseSectionRef
 }) {
-
   return (
     <>
       <HeroSection />
@@ -49,13 +44,15 @@ function HomePage({
         hoveredCard={hoveredCard}
         setHoveredCard={setHoveredCard}
         setSelectedProduct={setSelectedProduct}
-        setShowedModal={setShowedModal} />
+        setShowedModal={setShowedModal}
+      />
       <AboutUsSection />
       <KnowledgeBaseSection />
       <ClientsSection />
     </>
   );
 }
+
 function parseJwt(token) {
   try {
     const base64Url = token.split('.')[1];
@@ -74,18 +71,25 @@ function parseJwt(token) {
 
 function App() {
   const [loading, setLoading] = useState(true);
-
-  // State yang diperlukan untuk HomePage
   const [hoveredCard, setHoveredCard] = useState(null);
-
   const [subscriptions, setSubscriptions] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState({});
-  const [showedModal, setShowedModal] = useState(null); // 'product' | 'login' | null
-
+  const [showedModal, setShowedModal] = useState(null);
   const [username, setUsername] = useState(null);
 
   const productSectionRef = useRef(null);
   const courseSectionRef = useRef(null);
+
+  const [productModalRequest, setProductModalRequest] = useState(null);
+
+
+  const scrollToProduct = () => {
+    productSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToCourse = () => {
+    courseSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const requestLogin = (nextAction) => {
     const url = new URL(window.location);
@@ -94,53 +98,151 @@ function App() {
     setShowedModal('login');
   };
 
+  // Ambil token dan user info dari cookie
   useEffect(() => {
-    // Ambil token dari cookies
     const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
     if (match) {
       const token = match[2];
-
       fetch('https://bot.kediritechnopark.com/webhook/user-dev/data', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
-
         },
       })
         .then(res => res.json())
         .then(data => {
-
           if (data && data.token) {
-            // Update token with data[0].token
             document.cookie = `token=${data.token}; path=/`;
-            console.log(data)
-            setSubscriptions(data.subscriptions)
+            setSubscriptions(data.subscriptions);
             const payload = parseJwt(data.token);
             if (payload && payload.username) {
               setUsername(payload.username);
             }
-          } else {
-            console.warn('Token tidak ditemukan dalam data.');
           }
         })
         .catch(err => console.error('Fetch error:', err));
+    }
+  }, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const modalType = params.get('modal');
+    const productId = params.get('product_id');
+    const authorizedUri = params.get('authorized_uri');
+    const unauthorizedUri = params.get('unauthorized_uri');
 
+    if (modalType === 'product' && productId) {
+      const token = document.cookie.match(/(^| )token=([^;]+)/)?.[2];
+
+      // Simpan semua param penting ke localStorage
+      localStorage.setItem('product_id', productId);
+      if (authorizedUri) localStorage.setItem('authorized_uri', authorizedUri);
+      if (unauthorizedUri) localStorage.setItem('unauthorized_uri', unauthorizedUri);
+
+      // Jika belum login, tampilkan modal login
+      if (!token) {
+        setShowedModal('login');
+      }
+      // Jika sudah login, tidak langsung fetch di sini — akan diproses saat subscriptions tersedia
+    }
+  }, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const modalType = params.get('modal');
+    const productId = parseInt(params.get('product_id'));
+    const authorizedUri = params.get('authorized_uri');
+    const unauthorizedUri = params.get('unauthorized_uri');
+
+    const token = document.cookie.match(/(^| )token=([^;]+)/)?.[2];
+
+    if (modalType === 'product' && productId) {
+      if (!token) {
+        setShowedModal('login'); // belum login → tampilkan login modal
+      } else {
+        // sudah login → lanjutkan proses otorisasi saat subscriptions tersedia
+        setProductModalRequest({ productId, authorizedUri, unauthorizedUri });
+        console.log('modal')
+      }
     }
   }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('next')) {
-        setShowedModal('login');
+    if (!productModalRequest) return;
+
+    const { productId, authorizedUri, unauthorizedUri } = productModalRequest;
+
+    const hasAccess = subscriptions && subscriptions.some(sub => sub.product_id === productId);
+
+    if (hasAccess) {
+      if (authorizedUri) {
+        let finalUri = decodeURIComponent(authorizedUri);
+        const token = document.cookie.match(/(^| )token=([^;]+)/)?.[2];
+
+        if (finalUri.includes('token=null') || finalUri.includes('token=')) {
+          const url = new URL(finalUri);
+          url.searchParams.set('token', token || '');
+          finalUri = url.toString();
+        }
+
+        window.location.href = finalUri;
+      }
+      else {// Assuming you already imported processProducts from './processProducts'
+
+        fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            itemsId: [productId],
+            withChildren: true,
+          }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+              // Process the raw data to group children under their parent
+              const processed = processProducts(data);
+              // Set the first product (which should be the parent with children nested)
+              setSelectedProduct(processed[0]);
+              setShowedModal('product');
+            }
+          })
+          .catch(err => console.error('Fetch product error:', err));
+      }
+    } else {
+      if (unauthorizedUri) {
+        window.location.href = decodeURIComponent(unauthorizedUri);
+      } else {
+
+        fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            itemsId: [productId],
+            withChildren: true,
+          }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+              // Process the raw data to group children under their parent
+              const processed = processProducts(data);
+              // Set the first product (which should be the parent with children nested)
+              setSelectedProduct(processed[0]);
+              setShowedModal('product');
+            }
+          })
+          .catch(err => console.error('Fetch product error:', err));
+      
+        console.log('modal')
+      }
     }
-  }, []);
-  const scrollToProduct = () => {
-    productSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-  const scrollToCourse = () => {
-    courseSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+
+    setProductModalRequest(null); // reset
+  }, [subscriptions, productModalRequest]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -150,13 +252,8 @@ function App() {
   }, []);
 
   const handleLogout = () => {
-    // Hapus cookie token dengan mengatur tanggal kadaluarsa ke masa lalu
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC';
-
-    // Jika kamu menggunakan state seperti `setUsername`, bersihkan di sini juga
-    setUsername(null); // jika applicable
-
-    // Redirect ke homepage atau reload halaman
+    setUsername(null);
     window.location.reload();
   };
 
@@ -178,7 +275,13 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Header username={username} scrollToProduct={scrollToProduct} scrollToCourse={scrollToCourse} setShowedModal={setShowedModal} handleLogout={handleLogout} />
+        <Header
+          username={username}
+          scrollToProduct={scrollToProduct}
+          scrollToCourse={scrollToCourse}
+          setShowedModal={setShowedModal}
+          handleLogout={handleLogout}
+        />
         <Routes>
           <Route
             path="/"
@@ -195,38 +298,28 @@ function App() {
               />
             }
           />
-          <Route
-            path="/products"
-            element={
-              <ProductsPage subscriptions={subscriptions}/>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard />
-            }
-          />
+          <Route path="/products" element={<ProductsPage subscriptions={subscriptions} />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
         <Footer />
-        {/* Unified Modal */}
+
+        {/* Modal */}
         {showedModal && (
           <div
             className={styles.modal}
             onClick={() => {
               const url = new URL(window.location);
-              if (url.searchParams.has('next')) {
-                url.searchParams.delete('next');
-                window.history.pushState({}, '', url);
-              }
+              url.searchParams.delete('modal');
+              url.searchParams.delete('product_id');
+              url.searchParams.delete('authorized_uri');
+              url.searchParams.delete('unauthorized_uri');
+              url.searchParams.delete('next');
+              window.history.pushState({}, '', url);
               setShowedModal(null);
               setSelectedProduct({});
             }}
           >
-            <div
-              className={styles.modalBody}
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className={styles.modalBody} onClick={(e) => e.stopPropagation()}>
               {showedModal === 'product' && (
                 <ProductDetailPage
                   subscriptions={subscriptions}

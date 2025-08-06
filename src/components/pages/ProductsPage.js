@@ -150,14 +150,18 @@ const CoursePage = ({ subscriptions }) => {
                                         onMouseEnter={() => setHoveredCard(product.name)}
                                         onMouseLeave={() => setHoveredCard(null)}
                                     >
+                                        <div>
                                         <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }}>
                                             {/* {product.price == 0 && (
                                                 <span className={styles.courseLabel}>Free</span>
                                             )} */}
                                         </div>
-                                        <div className={styles.courseContent}>
+                                        <div className={styles.courseContentTop}>
                                             <h3 className={styles.courseTitle}>{product.name}</h3>
                                             <p className={styles.courseDesc}>{product.description}</p>
+                                        </div>
+                                        </div>
+                                        <div className={styles.courseContentBottom}>
                                             <div className={styles.coursePrice}>
                                                 <span
                                                     className={

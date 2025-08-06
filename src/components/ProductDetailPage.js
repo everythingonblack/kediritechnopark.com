@@ -84,7 +84,7 @@ if (hasMatchingSubscription) {
     }
     // No children, no matching subscription
     const itemsParam = JSON.stringify([product.id]);
-    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+    window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
   };
 
   const onConfirmChildren = () => {
@@ -103,7 +103,7 @@ if (hasMatchingSubscription) {
     }
 
     const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
-    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+    window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
   };
 
   const onFinalCheckoutNewProduct = () => {
@@ -117,7 +117,7 @@ if (hasMatchingSubscription) {
     const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
     const encodedName = encodeURIComponent(customName.trim());
 
-    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&new_name=${encodedName}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+    window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&new_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
   };
 
   const onConfirmSelector = () => {
@@ -139,7 +139,7 @@ if (hasMatchingSubscription) {
       const productName = selectedSubscription?.product_name;
       const encodedName = encodeURIComponent(productName);
 
-      window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&set_name=${encodedName}&redirect_uri=http://localhost:3000/products&redirect_failed=http://localhost:3000`;
+      window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&set_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
     }
   };
 
