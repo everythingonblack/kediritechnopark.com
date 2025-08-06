@@ -81,12 +81,18 @@ function App() {
   const [subscriptions, setSubscriptions] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState({});
   const [showedModal, setShowedModal] = useState(null); // 'product' | 'login' | null
-  const [postLoginAction, setPostLoginAction] = useState(null);
 
   const [username, setUsername] = useState(null);
 
   const productSectionRef = useRef(null);
   const courseSectionRef = useRef(null);
+
+  const requestLogin = (nextAction) => {
+    const url = new URL(window.location);
+    url.searchParams.set('next', nextAction);
+    window.history.pushState({}, '', url);
+    setShowedModal('login');
+  };
 
   useEffect(() => {
     // Ambil token dari cookies
@@ -120,6 +126,13 @@ function App() {
         })
         .catch(err => console.error('Fetch error:', err));
 
+    }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('next')) {
+        setShowedModal('login');
     }
   }, []);
   const scrollToProduct = () => {
@@ -201,6 +214,11 @@ function App() {
           <div
             className={styles.modal}
             onClick={() => {
+              const url = new URL(window.location);
+              if (url.searchParams.has('next')) {
+                url.searchParams.delete('next');
+                window.history.pushState({}, '', url);
+              }
               setShowedModal(null);
               setSelectedProduct({});
             }}
@@ -212,17 +230,13 @@ function App() {
               {showedModal === 'product' && (
                 <ProductDetailPage
                   subscriptions={subscriptions}
-                  setPostLoginAction={setPostLoginAction}
-                  setShowedModal={setShowedModal}
+                  requestLogin={requestLogin}
                   product={selectedProduct}
-                  onClose={() => {
-                    setShowedModal(null);
-                    setSelectedProduct({});
-                  }}
+                  setShowedModal={setShowedModal}
                 />
               )}
               {showedModal === 'login' && (
-                <Login postLoginAction={postLoginAction} setPostLoginAction={setPostLoginAction} onClose={() => setShowedModal(null)} />
+                <Login setShowedModal={setShowedModal} />
               )}
             </div>
           </div>

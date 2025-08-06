@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const LoginRegister = ({postLoginAction, setPostLoginAction}) => {
+const LoginRegister = ({setShowedModal}) => {
   const [tab, setTab] = useState('login'); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -95,11 +95,17 @@ const LoginRegister = ({postLoginAction, setPostLoginAction}) => {
       if (token) {
         document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60}`;
         
-        if (postLoginAction) {
-          postLoginAction(); // resume action (e.g., checkout)
-          setPostLoginAction(null);
+        const params = new URLSearchParams(window.location.search);
+        const nextAction = params.get('next');
+
+        if (nextAction === 'checkout') {
+          params.delete('next');
+          const newUrl = `${window.location.pathname}?${params.toString()}`;
+          window.history.replaceState({}, '', newUrl);
+          setShowedModal('product');
+        } else {
+          window.location.reload();
         }
-        // window.location.reload()
       } else {
         alert('Token tidak ditemukan pada respons login');
       }

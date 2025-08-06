@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './ProductDetail.module.css';
 
-const ProductDetail = ({ subscriptions, product, setPostLoginAction, setShowedModal }) => {
+const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal }) => {
   const [showChildSelector, setShowChildSelector] = useState(false);
   const [selectedChildIds, setSelectedChildIds] = useState([]);
 
@@ -33,8 +33,7 @@ const ProductDetail = ({ subscriptions, product, setPostLoginAction, setShowedMo
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
 
     if (!token) {
-      setPostLoginAction(() => () => setShowedModal('product'));
-      setShowedModal('login');
+      requestLogin('checkout');
       return;
     }
     if (product.type == 'product') {
