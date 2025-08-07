@@ -168,7 +168,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
                 className={`${styles.button} ${styles.checkoutButton}`}
                 onClick={() => {
                   const token = (document.cookie.split('; ').find(row => row.startsWith('token=')) || '').split('=')[1] || '';
-const url = `${product.site_url}/${product.name.toLowerCase().replace(/\s+/g, '_')}?token=${token}`;
+                        const url = `${product.site_url}/dashboard/${product.name.toLowerCase().replace(/\s+/g, '_')}?token=${token}`;
                   window.open(url, '_blank');
                 }}
               >
