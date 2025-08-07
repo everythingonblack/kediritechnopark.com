@@ -38,47 +38,47 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
     }
     if (product.type == 'product') {
       const hasMatchingSubscription = Array.isArray(subscriptions) &&
-  subscriptions.some(sub =>
-    sub.product_id === product.id || sub.product_parent_id === product.id
-  );
+        subscriptions.some(sub =>
+          String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
+        );
 
-// Always show children selector first if product has children
-if (product.children && product.children.length > 0) {
-  setShowChildSelector(true);
+      // Always show children selector first if product has children
+      if (product.children && product.children.length > 0) {
+        setShowChildSelector(true);
 
-  if (hasMatchingSubscription) {
-    const matching = subscriptions.filter(sub =>
-      sub.product_id === product.id || sub.product_parent_id === product.id
-    );
+        if (hasMatchingSubscription) {
+          const matching = subscriptions.filter(sub =>
+            String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
+          );
 
-    if (matching.length > 0) {
-      // ✅ Select only the first for each product_name
-      const uniqueByName = Array.from(
-        new Map(matching.map(sub => [sub.product_name, sub])).values()
-      );
+          if (matching.length > 0) {
+            // ✅ Select only the first for each product_name
+            const uniqueByName = Array.from(
+              new Map(matching.map(sub => [sub.product_name, sub])).values()
+            );
 
-      setMatchingSubscriptions(uniqueByName);
-    }
-  }
-  return;
-}
+            setMatchingSubscriptions(uniqueByName);
+          }
+        }
+        return;
+      }
 
-// No children, but has subscription match
-if (hasMatchingSubscription) {
-  const matching = subscriptions.filter(sub =>
-    sub.product_id === product.id || sub.product_parent_id === product.id
-  );
+      // No children, but has subscription match
+      if (hasMatchingSubscription) {
+        const matching = subscriptions.filter(sub =>
+          String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
+        );
 
-  if (matching.length > 0) {
-    const uniqueByName = Array.from(
-      new Map(matching.map(sub => [sub.product_name, sub])).values()
-    );
+        if (matching.length > 0) {
+          const uniqueByName = Array.from(
+            new Map(matching.map(sub => [sub.product_name, sub])).values()
+          );
 
-    setMatchingSubscriptions(uniqueByName);
-    setShowSubscriptionSelector(true);
-    return;
-  }
-}
+          setMatchingSubscriptions(uniqueByName);
+          setShowSubscriptionSelector(true);
+          return;
+        }
+      }
 
 
     }
@@ -102,7 +102,7 @@ if (hasMatchingSubscription) {
       return;
     }
 
-    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
+    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) : JSON.stringify([product.id]);
     window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
   };
 
@@ -114,7 +114,7 @@ if (hasMatchingSubscription) {
 
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
-    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
+    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) : JSON.stringify([product.id]);
     const encodedName = encodeURIComponent(customName.trim());
 
     window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&new_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
@@ -131,11 +131,11 @@ if (hasMatchingSubscription) {
     } else {
       const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
       const token = tokenCookie ? tokenCookie.split('=')[1] : '';
-      const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) :  JSON.stringify([product.id]);
+      const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) : JSON.stringify([product.id]);
       const selectedSubscription = matchingSubscriptions.find(
         (sub) => sub.id === selectedSubscriptionId
       );
-      
+
       const productName = selectedSubscription?.product_name;
       const encodedName = encodeURIComponent(productName);
 
@@ -159,8 +159,12 @@ if (hasMatchingSubscription) {
           <p className={styles.description}>{product.description}</p>
           <div className={styles.buttonGroup}>
             <button className={`${styles.button} ${styles.checkoutButton}`} onClick={onCheckout}>
-              Checkout
+              {Array.isArray(subscriptions) &&
+                subscriptions.some(sub =>
+                  sub.product_id === product.id || sub.product_parent_id === product.id
+                ) ? 'Perpanjang' : 'Checkout'}
             </button>
+
           </div>
         </>
       )}
@@ -237,53 +241,53 @@ if (hasMatchingSubscription) {
         </div>
       )}
 
-{showNamingInput && (
-  <div className={styles.childSelector}>
-    <h5>Buat {product.name} Baru</h5>
-    <input
-      type="text"
-      placeholder="Nama produk..."
-      className={styles.input}
-      value={customName}
-      onChange={(e) => setCustomName(e.target.value)}
-      style={{ width: '100%', padding: '8px', marginBottom: '16px', borderRadius: '10px' }}
-    />
+      {showNamingInput && (
+        <div className={styles.childSelector}>
+          <h5>Buat {product.name} Baru</h5>
+          <input
+            type="text"
+            placeholder="Nama produk..."
+            className={styles.input}
+            value={customName}
+            onChange={(e) => setCustomName(e.target.value)}
+            style={{ width: '100%', padding: '8px', marginBottom: '16px', borderRadius: '10px' }}
+          />
 
-    {
-      matchingSubscriptions.some(
-        (sub) => sub.product_name === `${product.name}@${customName}`
-      ) && (
-        <p style={{ color: 'red', marginBottom: '10px' }}>
-          Nama produk sudah digunakan.
-        </p>
-      )
-    }
+          {
+            matchingSubscriptions.some(
+              (sub) => sub.product_name === `${product.name}@${customName}`
+            ) && (
+              <p style={{ color: 'red', marginBottom: '10px' }}>
+                Nama produk sudah digunakan.
+              </p>
+            )
+          }
 
-    <div className={styles.buttonGroup}>
-      <button
-        className={styles.button}
-        onClick={() => {
-          setShowNamingInput(false);
-          setShowSubscriptionSelector(true);
-        }}
-      >
-        Kembali
-      </button>
-      <button
-        className={styles.button}
-        onClick={onFinalCheckoutNewProduct}
-        disabled={
-          customName.trim() === '' ||
-          matchingSubscriptions.some(
-            (sub) => sub.product_name === `${product.name}@${customName}`
-          )
-        }
-      >
-        Checkout
-      </button>
-    </div>
-  </div>
-)}
+          <div className={styles.buttonGroup}>
+            <button
+              className={styles.button}
+              onClick={() => {
+                setShowNamingInput(false);
+                setShowSubscriptionSelector(true);
+              }}
+            >
+              Kembali
+            </button>
+            <button
+              className={styles.button}
+              onClick={onFinalCheckoutNewProduct}
+              disabled={
+                customName.trim() === '' ||
+                matchingSubscriptions.some(
+                  (sub) => sub.product_name === `${product.name}@${customName}`
+                )
+              }
+            >
+              Checkout
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -124,6 +124,7 @@ function App() {
         .catch(err => console.error('Fetch error:', err));
     }
   }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const modalType = params.get('modal');
@@ -146,6 +147,7 @@ function App() {
       // Jika sudah login, tidak langsung fetch di sini — akan diproses saat subscriptions tersedia
     }
   }, []);
+  
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const modalType = params.get('modal');
@@ -167,12 +169,15 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!productModalRequest) return;
+    console.log(subscriptions)
+    if (!productModalRequest || !subscriptions) return;
 
     const { productId, authorizedUri, unauthorizedUri } = productModalRequest;
-
-    const hasAccess = subscriptions && subscriptions.some(sub => sub.product_id === productId);
-
+    console.log(subscriptions)
+    const hasAccess = subscriptions && subscriptions.some(
+      sub => sub.product_id === productId || sub.product_parent_id === productId
+    );
+    console.log(hasAccess)
     if (hasAccess) {
       if (authorizedUri) {
         let finalUri = decodeURIComponent(authorizedUri);
