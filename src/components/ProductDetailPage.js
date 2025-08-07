@@ -69,13 +69,18 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
           String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
         );
 
-        if (matching.length > 0) {
+        if (matching.length > 0 && !product.end_date) {
           const uniqueByName = Array.from(
             new Map(matching.map(sub => [sub.product_name, sub])).values()
           );
 
           setMatchingSubscriptions(uniqueByName);
           setShowSubscriptionSelector(true);
+          return;
+        }
+        else {
+          const itemsParam = JSON.stringify([product.id]);
+          window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&set_name=${product.name}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
           return;
         }
       }
@@ -158,11 +163,24 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
           </div>
           <p className={styles.description}>{product.description}</p>
           <div className={styles.buttonGroup}>
+            {product.end_date && product.site_url && (
+              <button
+                className={`${styles.button} ${styles.checkoutButton}`}
+                onClick={() => {
+                  const token = (document.cookie.split('; ').find(row => row.startsWith('token=')) || '').split('=')[1] || '';
+const url = `${product.site_url}/${product.name.toLowerCase().replace(/\s+/g, '_')}?token=${token}`;
+                  window.open(url, '_blank');
+                }}
+              >
+                KUNJUNGI
+              </button>
+            )}
+
             <button className={`${styles.button} ${styles.checkoutButton}`} onClick={onCheckout}>
               {Array.isArray(subscriptions) &&
                 subscriptions.some(sub =>
                   sub.product_id === product.id || sub.product_parent_id === product.id
-                ) ? 'Perpanjang' : 'Checkout'}
+                ) && product.end_date ? 'Perpanjang' : 'Checkout'}
             </button>
 
           </div>

@@ -188,19 +188,6 @@ const CoursePage = ({ subscriptions }) => {
                                         setSelectedProduct({});
                                     }}
                                 />
-                                {/* Tombol KUNJUNGI */}
-                                {selectedProduct.site_url && (
-                                    <a
-                                        href={`${selectedProduct.site_url}?token=${localStorage.getItem("token")}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={styles.ctaButton}
-                                        style={{ marginTop: '1rem' }}
-                                    >
-                                        KUNJUNGI
-                                    </a>
-                                )}
-
                             </div>
                         )}
                         {showedModal === 'login' && (
@@ -208,8 +195,9 @@ const CoursePage = ({ subscriptions }) => {
                         )}
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 
