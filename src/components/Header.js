@@ -26,11 +26,22 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
           onMouseEnter={() => setHoveredNav(3)}
           onMouseLeave={() => setHoveredNav(null)}
           onClick={() => {
-            if (!username) scrollToCourse();
+            if (!username) scrollToProduct();
             else navigate('/products');
           }}
         >
           {username ? 'MY PRODUCTS' : 'PRODUCTS'}
+        </a>
+        <a
+          className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
+          onMouseEnter={() => setHoveredNav(3)}
+          onMouseLeave={() => setHoveredNav(null)}
+          onClick={() => {
+            if (!username) scrollToCourse();
+            else window.location.href = 'https://academy.kediritechnopark.com'
+          }}
+        >
+          {username ? 'MY ACADEMY' : 'ACADEMY'}
         </a>
       </nav>
 

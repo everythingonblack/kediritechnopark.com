@@ -5,7 +5,7 @@ const ServicesSection = () => {
   return (
     <section id="services" className="services py-5">
       <Container>
-        <div className="section-heading text-center mb-4">
+        <div className="section-heading  mb-4">
           <h4>OUR <em>SERVICES</em></h4>
           <img src="/assets/images/heading-line-dec.png" alt="" />
           <p>Kami menyediakan berbagai solusi teknologi untuk mendukung transformasi digital bisnis dan masyarakat.</p>

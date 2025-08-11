@@ -77,7 +77,7 @@ const LoginRegister = ({setShowedModal}) => {
     }
 
     try {
-      const res = await fetch('https://bot.kediritechnopark.com/webhook/user-dev/login', {
+      const res = await fetch('https://bot.kediritechnopark.com/webhook/user-production/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -122,7 +122,7 @@ const LoginRegister = ({setShowedModal}) => {
     }
 
     try {
-      const res = await fetch('https://bot.kediritechnopark.com/webhook/user-dev/register', {
+      const res = await fetch('https://bot.kediritechnopark.com/webhook/user-production/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, username, password }),

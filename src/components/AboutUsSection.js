@@ -17,8 +17,8 @@ const AboutUsSection = () => {
                 Dengan misi memberdayakan talenta lokal, menjembatani teknologi dan industri, serta mempercepat transformasi digital, Kediri Technopark berkomitmen menjadi penggerak kemajuan ekonomi dan teknologi, baik di tingkat lokal maupun nasional.
               </p>
               <div className="mt-4 d-flex gap-3">
-                <Button href="konsultasi.html" className="px-4 py-2 rounded-pill text-white" style={{ background: 'linear-gradient(to right, #6a59ff, #8261ee)', border: 'none' }}>
-                  Konsultasi
+                <Button href="https://instagram.com/kediri.technopark" className="px-4 py-2 rounded-pill text-white" style={{ background: 'linear-gradient(to right, #6a59ff, #8261ee)', border: 'none' }}>
+                  Instagram
                 </Button>
                 <Button href="https://wa.me/6281318894994" target="_blank" variant="outline-success" className="px-4 py-2 rounded-pill">
                   <i className="fab fa-whatsapp"></i> WhatsApp

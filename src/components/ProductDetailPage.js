@@ -85,6 +85,8 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
         }
       }
 
+          setShowNamingInput(true);
+          return;
 
     }
     // No children, no matching subscription
@@ -156,20 +158,20 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
         <>
           <div className={styles.image} style={{ backgroundImage: `url(${product.image})` }}></div>
           <div className={styles.headerRow}>
-            <h2 className={styles.title}>{product.name}</h2>
+            <h2 className={styles.title}>{product.name.split('%%%')[0]}</h2>
             <div className={styles.price} style={{ color: priceColor }}>
               {product.price == null ? 'Pay-As-You-Go' : `Rp ${parseInt(product.price).toLocaleString('id-ID')}`}
             </div>
           </div>
           <p className={styles.description}>{product.description}</p>
           <div className={styles.buttonGroup}>
-            {product.end_date && product.site_url && (
+            {product.site_url && (
               <button
                 className={`${styles.button} ${styles.checkoutButton}`}
                 onClick={() => {
                   const token = (document.cookie.split('; ').find(row => row.startsWith('token=')) || '').split('=')[1] || '';
-                        const url = `${product.site_url}/dashboard/${product.name.toLowerCase().replace(/\s+/g, '_')}?token=${token}`;
-                  window.open(url, '_blank');
+                  const url = `https://${product.site_url}/dashboard/${product.name.split('%%%')[0]}?token=${token}`;
+                  window.location.href = url;
                 }}
               >
                 KUNJUNGI
@@ -225,7 +227,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
 
       {showSubscriptionSelector && !showNamingInput && (
         <div className={styles.childSelector}>
-          <h5>Perpanjang {product.name}</h5>
+          <h5>Perpanjang {product.name.split('%%%')[0]} </h5>
           {matchingSubscriptions.map(sub => (
             <label key={sub.id} className={styles.childProduct}>
               <input
@@ -235,7 +237,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
                 checked={selectedSubscriptionId == sub.id}
                 onChange={() => { setSelectedSubscriptionId(sub.id); setCustomName(sub.product_name) }}
               />
-              &nbsp;{sub.product_name}
+              &nbsp;{sub.product_name.split('%%%')[0]}
             </label>
           ))}
           <h6>Atau buat baru</h6>
@@ -246,7 +248,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
               checked={selectedSubscriptionId === product.id}
               onChange={() => setSelectedSubscriptionId(product.id)}
             />
-            &nbsp;Buat {product.name} baru
+            &nbsp;Buat {product.name.split('%%%')[0]} baru
           </label>
           <div className={styles.buttonGroup}>
             <button className={styles.button} onClick={() => setShowSubscriptionSelector(false)}>
@@ -261,7 +263,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
 
       {showNamingInput && (
         <div className={styles.childSelector}>
-          <h5>Buat {product.name} Baru</h5>
+          <h5>Buat {product.name.split('%%%')[0]} Baru</h5>
           <input
             type="text"
             placeholder="Nama produk..."
@@ -286,7 +288,12 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
               className={styles.button}
               onClick={() => {
                 setShowNamingInput(false);
-                setShowSubscriptionSelector(true);
+
+      const hasMatchingSubscription = Array.isArray(subscriptions) &&
+        subscriptions.some(sub =>
+          String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
+        );
+                if(hasMatchingSubscription) setShowSubscriptionSelector(true);
               }}
             >
               Kembali

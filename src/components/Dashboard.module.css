@@ -117,6 +117,9 @@
 }
 
 .chartCard {
+  width: 100%;
+  color: black;
+  text-align: left;
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -382,4 +385,11 @@
 
 .suggestionButton:hover {
   background-color: #ccc;
+}
+
+
+.formActions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
 }

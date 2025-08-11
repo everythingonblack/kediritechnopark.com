@@ -14,6 +14,7 @@ import ClientsSection from './components/ClientsSection';
 import Footer from './components/Footer';
 import ProductDetailPage from './components/ProductDetailPage';
 import Dashboard from './components/Dashboard';
+import CreateProductPage from './components/CreateProductPage';
 import ProductsPage from './components/pages/ProductsPage';
 
 import processProducts from './helper/processProducts';
@@ -31,6 +32,8 @@ function HomePage({
   return (
     <>
       <HeroSection />
+
+      <AboutUsSection />
       <ServicesSection />
       <ProductSection
         productSectionRef={productSectionRef}
@@ -46,7 +49,6 @@ function HomePage({
         setSelectedProduct={setSelectedProduct}
         setShowedModal={setShowedModal}
       />
-      <AboutUsSection />
       <KnowledgeBaseSection />
       <ClientsSection />
     </>
@@ -75,6 +77,7 @@ function App() {
   const [subscriptions, setSubscriptions] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState({});
   const [showedModal, setShowedModal] = useState(null);
+  const [subProductOf, setSubProductOf] = useState(null);
   const [username, setUsername] = useState(null);
 
   const productSectionRef = useRef(null);
@@ -103,7 +106,7 @@ function App() {
     const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
     if (match) {
       const token = match[2];
-      fetch('https://bot.kediritechnopark.com/webhook/user-dev/data', {
+      fetch('https://bot.kediritechnopark.com/webhook/user-production/data', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +124,11 @@ function App() {
             }
           }
         })
-        .catch(err => console.error('Fetch error:', err));
+        .catch(err => {
+          document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+          setUsername(null);
+          window.location.reload();
+        });
     }
   }, []);
 
@@ -147,7 +154,7 @@ function App() {
       // Jika sudah login, tidak langsung fetch di sini — akan diproses saat subscriptions tersedia
     }
   }, []);
-  
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const modalType = params.get('modal');
@@ -193,7 +200,7 @@ function App() {
       }
       else {// Assuming you already imported processProducts from './processProducts'
 
-        fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+        fetch('https://bot.kediritechnopark.com/webhook/store-production/products', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -220,7 +227,7 @@ function App() {
         window.location.href = decodeURIComponent(unauthorizedUri);
       } else {
 
-        fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+        fetch('https://bot.kediritechnopark.com/webhook/store-production/products', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -241,7 +248,7 @@ function App() {
             }
           })
           .catch(err => console.error('Fetch product error:', err));
-      
+
         console.log('modal')
       }
     }
@@ -304,7 +311,17 @@ function App() {
             }
           />
           <Route path="/products" element={<ProductsPage subscriptions={subscriptions} />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            path="/dashboard"
+            element={
+              <Dashboard
+                setShowedModal={(e, productId) => {
+                  setShowedModal(e);
+                  setSubProductOf(productId);
+                }}
+              />
+            }
+          />
         </Routes>
         <Footer />
 
@@ -327,6 +344,15 @@ function App() {
             <div className={styles.modalBody} onClick={(e) => e.stopPropagation()}>
               {showedModal === 'product' && (
                 <ProductDetailPage
+                  subscriptions={subscriptions}
+                  requestLogin={requestLogin}
+                  product={selectedProduct}
+                  setShowedModal={setShowedModal}
+                />
+              )}
+              {showedModal === 'create-item' && (
+                <CreateProductPage
+                  parentId={subProductOf}
                   subscriptions={subscriptions}
                   requestLogin={requestLogin}
                   product={selectedProduct}

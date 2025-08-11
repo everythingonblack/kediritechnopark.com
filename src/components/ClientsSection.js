@@ -1,23 +1,35 @@
 import React from 'react';
 import { Container, Row, Col, Image } from 'react-bootstrap';
+import styles from './Styles.module.css';
 
 const ClientsSection = () => {
+  const logos = [
+    'dermalounge.jpg',
+    'suar.avif',
+    'kloowear.png',
+    'psi.png',
+  ];
+
   return (
-    <section id="clients" className="the-clients section pt-5">
+    <section id="clients" className="the-clients section py-5">
       <Container>
         <Row>
-          <Col lg={{ span: 8, offset: 2 }}>
-            <div className="section-heading text-center mb-4">
+          <Col>
+            <div className="section-heading mb-4">
               <h4>TRUSTED BY <em>OUR CLIENTS</em></h4>
-              <img src="/assets/images/heading-line-dec.png" alt="" className="mb-3" />
               <p>We are proud to work with these amazing brands and organizations.</p>
             </div>
-            <div id="clients-carousel" className="d-flex justify-content-center flex-wrap">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <div key={num} className="client-logo-wrapper m-2">
-                  <Image src={`/assets/images/client-logo${num}.png`} alt={`Client ${num}`} fluid />
+            <div id="clients-carousel" className="d-flex justify-content-left flex-wrap">
+              {logos.map((logo, index) => (
+                <div className={`${styles.clientLogoWrapper} m-2`} key={index}>
+                  <Image
+                    src={`https://kediritechnopark.com/assets/${logo}`}
+                    fluid
+                    className={styles.clientLogo}
+                  />
                 </div>
-              ))}</div>
+              ))}
+            </div>
           </Col>
         </Row>
       </Container>

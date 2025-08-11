@@ -29,7 +29,7 @@
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
+    /* position: sticky; */
     top: 0;
     z-index: 1000;
 }
@@ -217,7 +217,7 @@
 .courseImage {
     width: 100%;
     height: 200px;
-    background-color: #e2e8f0;
+    background-color: white;
     position: relative;
     display: flex;
     align-items: center;
@@ -225,7 +225,7 @@
     color: #64748b;
     
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
     background-position: center;
 }
 
@@ -635,4 +635,36 @@
 .logoutButton:hover {
   background-color: #2563eb;
   color: white;
+}
+
+.clientLogoWrapper {
+  max-width: 150px; /* batas lebar */
+  max-height: 80px; /* batas tinggi */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clientLogo {
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer{
+    padding: 0;
+}
+
+.footer a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline; /* opsional kalau mau hover effect */
+}
+
+.logo img {
+  max-width: 150px; /* biar logo tidak terlalu besar */
+  height: auto;
 }

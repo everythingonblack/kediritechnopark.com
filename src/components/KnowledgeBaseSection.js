@@ -6,10 +6,10 @@ const KnowledgeBaseSection = () => {
     <section id="knowledge" className="knowledge section pt-5">
       <Container>
         <Row>
-          <Col lg={{ span: 8, offset: 2 }}>
-            <div className="section-heading text-center mb-4">
+          <Col >
+            <div className="section-heading mb-4">
               <h4>KNOWLEDGE <em>BASE</em></h4>
-              <img src="/assets/images/heading-line-dec.png" alt="" className="mb-3" />
+              {/* <img src="/assets/images/heading-line-dec.png" alt="" className="mb-3" /> */}
               <p>Berbagai artikel dan panduan untuk membantu Anda memahami teknologi dan inovasi digital.</p>
             </div>
             <div className="knowledge-content">

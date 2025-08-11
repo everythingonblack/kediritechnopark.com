@@ -11,7 +11,7 @@ const ProductSection = ({ hoveredCard, setHoveredCard, setSelectedProduct, setSh
 
 // Inside your component
 useEffect(() => {
-  fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+  fetch('https://bot.kediritechnopark.com/webhook/store-production/products', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -28,9 +28,9 @@ useEffect(() => {
 
   return (
 
-    <section id="services" className="services pt-5">
+    <section id="services" className="services pt-5" ref={productSectionRef}>
       <Container>
-        <div className="section-heading text-center mb-4">
+        <div className="section-heading  mb-4">
           <h4>OUR <em>PRODUCTS</em></h4>
           <img src="/assets/images/heading-line-dec.png" alt="" />
           <p>Kami menyediakan berbagai solusi teknologi untuk mendukung transformasi digital bisnis dan masyarakat.</p>

@@ -65,7 +65,7 @@ const CoursePage = ({ subscriptions }) => {
         const groupedSubs = groupSubscriptionsByProductName(subscriptions);
         const productIds = [...new Set(subscriptions.map(s => s.product_id))];
 
-        fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
+        fetch('https://bot.kediritechnopark.com/webhook/store-production/products', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ const CoursePage = ({ subscriptions }) => {
                                     <div>
                                         <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }} />
                                         <div className={styles.courseContentTop}>
-                                            <h3 className={styles.courseTitle}>{product.name}</h3>
+                                            <h3 className={styles.courseTitle}>{product.name.split('%%%')[0]}</h3>
                                             <p className={styles.courseDesc}>{product.description}</p>
                                         </div>
                                     </div>

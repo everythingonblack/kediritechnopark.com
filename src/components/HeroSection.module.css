@@ -1,0 +1,109 @@
+
+.hero {
+  position: relative;
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.15), transparent 60%),
+              radial-gradient(1000px 500px at 110% 10%, rgba(34, 197, 94, 0.15), transparent 60%),
+              var(--surface);
+  overflow: clip;
+}
+
+.copyWrap {
+  max-width: var(--hero-maxw);
+}
+
+.title {
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  /* Fluid type: min 28px → max 56px */
+  font-size: clamp(1.75rem, 2.5vw + 1rem, 3.5rem);
+  background: linear-gradient(92deg, var(--text), #3b82f6 40%, #22c55e 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: black;
+}
+
+.lead {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: clamp(1rem, 0.6vw + 0.95rem, 1.2rem);
+}
+
+.ctaGroup { 
+  margin-top: 1.25rem; 
+}
+
+.cta {
+  --ring: 0 0 0 0 rgba(37,99,235,0);
+  border-radius: var(--radius-2xl) !important;
+  padding: 0.625rem 1rem !important;
+  font-weight: 600 !important;
+  backdrop-filter: saturate(140%);
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+  box-shadow: var(--shadow-soft);
+}
+
+.ctaPrimary:hover,
+.ctaPrimary:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.25);
+}
+
+.ctaSecondary:hover,
+.ctaSecondary:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.25);
+}
+
+.imageWrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.imageWrap::before,
+.imageWrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px; /* lebar gradasi di sisi */
+  pointer-events: none; /* biar nggak ganggu klik */
+  z-index: 2;
+}
+
+.imageWrap::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+}
+
+.imageWrap::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
+}
+
+
+.heroImage {
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-soft);
+}
+
+.glow {
+  position: absolute;
+  inset: auto 10% -10% 10%;
+  height: 40%;
+  filter: blur(40px);
+  z-index: -1;
+  background: radial-gradient(60% 60% at 50% 0%, rgba(59,130,246,.35), transparent 60%),
+              radial-gradient(50% 50% at 30% 60%, rgba(34,197,94,.25), transparent 60%);
+}
+
+/* Fine-tuned responsive spacing */
+@media (min-width: 992px) {
+  .copyWrap { padding-right: 1rem; }
+}
+
+@media (max-width: 575.98px) {
+  .hero { padding-top: 2rem; }
+}
