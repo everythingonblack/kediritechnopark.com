@@ -12,22 +12,6 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
   const [showNamingInput, setShowNamingInput] = useState(false);
   const [customName, setCustomName] = useState('');
 
-  const parseJWT = (token) => {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch {
-      return null;
-    }
-  };
-
   const onCheckout = () => {
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
@@ -85,8 +69,8 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
         }
       }
 
-          setShowNamingInput(true);
-          return;
+      setShowNamingInput(true);
+      return;
 
     }
     // No children, no matching subscription
@@ -170,11 +154,13 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
                 className={`${styles.button} ${styles.checkoutButton}`}
                 onClick={() => {
                   const token = (document.cookie.split('; ').find(row => row.startsWith('token=')) || '').split('=')[1] || '';
-                  const url = `https://${product.site_url}/dashboard/${product.name.split('%%%')[0]}?token=${token}`;
+                  const url = product.end_date
+                    ? `https://${product.site_url}/dashboard/${product.name.split('%%%')[0]}?token=${token}`
+                    : `https://${product.site_url}`;
                   window.location.href = url;
                 }}
               >
-                KUNJUNGI
+                PELAJARI LEBIH LANJUT
               </button>
             )}
 
@@ -289,11 +275,11 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
               onClick={() => {
                 setShowNamingInput(false);
 
-      const hasMatchingSubscription = Array.isArray(subscriptions) &&
-        subscriptions.some(sub =>
-          String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
-        );
-                if(hasMatchingSubscription) setShowSubscriptionSelector(true);
+                const hasMatchingSubscription = Array.isArray(subscriptions) &&
+                  subscriptions.some(sub =>
+                    String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
+                  );
+                if (hasMatchingSubscription) setShowSubscriptionSelector(true);
               }}
             >
               Kembali
