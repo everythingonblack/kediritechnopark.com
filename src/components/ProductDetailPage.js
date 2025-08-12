@@ -84,6 +84,11 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
       setShowSubscriptionSelector(true);
       return;
     }
+    else {
+      setShowChildSelector(false);
+      setShowNamingInput(true);
+      return;
+    }
 
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
@@ -117,7 +122,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
       return;
     }
 
-    if (selectedSubscriptionId === product.id) {
+    if (selectedSubscriptionId === 0) {
       setShowNamingInput(true);
     } else {
       const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
@@ -231,8 +236,8 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
             <input
               type="radio"
               name="subscription"
-              checked={selectedSubscriptionId === product.id}
-              onChange={() => setSelectedSubscriptionId(product.id)}
+              checked={selectedSubscriptionId === 0}
+              onChange={() => {setSelectedSubscriptionId(0); console.log(product.id)}}
             />
             &nbsp;Buat {product.name.split('%%%')[0]} baru
           </label>
