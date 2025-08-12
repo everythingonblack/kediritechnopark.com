@@ -33,8 +33,8 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
           {username ? 'MY PRODUCTS' : 'PRODUCTS'}
         </a>
         <a
-          className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
-          onMouseEnter={() => setHoveredNav(3)}
+          className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}
+          onMouseEnter={() => setHoveredNav(4)}
           onMouseLeave={() => setHoveredNav(null)}
           onClick={() => {
             if (!username) scrollToCourse();

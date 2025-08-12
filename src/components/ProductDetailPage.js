@@ -160,7 +160,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
                   window.location.href = url;
                 }}
               >
-                PELAJARI LEBIH LANJUT
+                {product.end_date ? 'KUNJUNGI SITUS' : 'PELAJARI LEBIH LANJUT'}
               </button>
             )}
 
