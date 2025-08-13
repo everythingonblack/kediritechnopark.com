@@ -140,7 +140,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
   };
 
   const priceColor = product.price === 0 ? '#059669' : '#2563eb';
-
+  console.log(product)
   return (
     <div className={styles.container}>
       {!showChildSelector && !showSubscriptionSelector && !showNamingInput && (
@@ -154,18 +154,18 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
           </div>
           <p className={styles.description}>{product.description}</p>
           <div className={styles.buttonGroup}>
-            {product.site_url && (
+            {(product.site_url || product.end_date || product.quantity) && (
               <button
                 className={`${styles.button} ${styles.checkoutButton}`}
                 onClick={() => {
                   const token = (document.cookie.split('; ').find(row => row.startsWith('token=')) || '').split('=')[1] || '';
-                  const url = product.end_date
-                    ? `https://${product.site_url}/dashboard/${product.name.split('%%%')[0]}?token=${token}`
+                  const url = product.quantity || product.end_date
+                    ? `https://${product.site_url}/${product.name.split('%%%')[0]}?token=${token}`
                     : `https://${product.site_url}`;
                   window.location.href = url;
                 }}
               >
-                {product.end_date ? 'KUNJUNGI SITUS' : 'PELAJARI LEBIH LANJUT'}
+                {product.end_date || product.quantity ? 'KUNJUNGI SITUS' : 'PELAJARI LEBIH LANJUT'}
               </button>
             )}
 

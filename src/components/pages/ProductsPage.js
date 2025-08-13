@@ -80,18 +80,22 @@ const CoursePage = ({ subscriptions }) => {
                         const productData = data.find(p => p.id == group.product_id);
                         let image = productData?.image || '';
                         let description = productData?.description || '';
+                        let site_url = productData?.site_url || '';
                         if (!image && productData?.sub_product_of) {
                             const parent = data.find(p => p.id === productData.sub_product_of);
+                            console.log(parent)
                             image = parent?.image || '';
                             description = parent?.description || '';
+                            site_url = parent?.site_url || '';
                         }
-
+                        console.log(site_url)
                         return {
                             id: group.product_id,
                             name: group.product_name,
                             type: productData?.type || 'product',
                             image: image,
                             description: description,
+                            site_url: site_url,
                             price: productData?.price || 0,
                             currency: productData?.currency || 'IDR',
                             duration: productData?.duration || {},
@@ -101,10 +105,9 @@ const CoursePage = ({ subscriptions }) => {
                             quantity: group.quantity,
                             end_date: group.end_date,
                             children: [],
-                            site_url: productData?.site_url || ''
                         };
                     });
-
+                    console.log(enrichedData)
                 setProducts(enrichedData);
             })
             .catch(err => console.error('Fetch error:', err));
