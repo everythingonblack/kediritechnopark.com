@@ -160,7 +160,7 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
                 onClick={() => {
                   const token = (document.cookie.split('; ').find(row => row.startsWith('token=')) || '').split('=')[1] || '';
                   const url = product.quantity || product.end_date
-                    ? `https://${product.site_url}/${product.name.split('%%%')[0]}?token=${token}`
+                    ? `https://${product.site_url}/dashboard/${product.name.split('%%%')[0]}?token=${token}`
                     : `https://${product.site_url}`;
                   window.location.href = url;
                 }}
