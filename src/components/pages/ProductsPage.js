@@ -3,11 +3,8 @@ import ProductDetailPage from '../ProductDetailPage';
 import Login from '../Login';
 import styles from '../Styles.module.css';
 
-const CoursePage = ({ subscriptions }) => {
-    const [postLoginAction, setPostLoginAction] = useState(null);
-    const [selectedProduct, setSelectedProduct] = useState({});
+const CoursePage = ({ subscriptions, setSelectedProduct, setShowedModal}) => {
     const [hoveredCard, setHoveredCard] = useState(null);
-    const [showedModal, setShowedModal] = useState(null);
     const [products, setProducts] = useState([]);
 
     // Buka modal otomatis berdasarkan query
@@ -107,7 +104,7 @@ const CoursePage = ({ subscriptions }) => {
                             children: [],
                         };
                     });
-                    console.log(enrichedData)
+                console.log(enrichedData)
                 setProducts(enrichedData);
             })
             .catch(err => console.error('Fetch error:', err));
@@ -156,50 +153,18 @@ const CoursePage = ({ subscriptions }) => {
                                                     : `SISA TOKEN ${product.quantity || 0}`}
                                             </span>
                                         </div>
+
+                                        <button className="px-4 py-2 rounded-pill text-white" style={{ background: 'linear-gradient(to right, #6a59ff, #8261ee)', border: 'none' }}
+                                            onClick={() => {
+                                                setSelectedProduct(product);
+                                                setShowedModal('product');
+                                            }}>Perpanjang</button>
                                     </div>
                                 </div>
                             ))}
                     </div>
                 </div>
             </section>
-
-            {/* Features Section */}
-            {/* ... tidak berubah ... */}
-
-            {/* Footer */}
-            {/* ... tidak berubah ... */}
-
-            {/* Unified Modal */}
-            {showedModal && (
-                <div
-                    className={styles.modal}
-                    onClick={() => {
-                        setShowedModal(null);
-                        setSelectedProduct({});
-                    }}
-                >
-                    <div className={styles.modalBody} onClick={(e) => e.stopPropagation()}>
-                        {showedModal === 'product' && (
-                            <div>
-                                <ProductDetailPage
-                                    setPostLoginAction={setPostLoginAction}
-                                    setShowedModal={setShowedModal}
-                                    product={selectedProduct}
-                                    subscriptions={subscriptions}
-                                    onClose={() => {
-                                        setShowedModal(null);
-                                        setSelectedProduct({});
-                                    }}
-                                />
-                            </div>
-                        )}
-                        {showedModal === 'login' && (
-                            <Login postLoginAction={postLoginAction} setPostLoginAction={setPostLoginAction} onClose={() => setShowedModal(null)} />
-                        )}
-                    </div>
-                </div>
-            )
-            }
         </div >
     );
 };

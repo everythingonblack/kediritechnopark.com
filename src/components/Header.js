@@ -21,28 +21,41 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
         >
           HOME
         </a>
-        <a
-          className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
-          onMouseEnter={() => setHoveredNav(3)}
-          onMouseLeave={() => setHoveredNav(null)}
-          onClick={() => {
-            if (!username) scrollToProduct();
-            else navigate('/products');
-          }}
-        >
-          {username ? 'MY PRODUCTS' : 'PRODUCTS'}
-        </a>
-        <a
-          className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}
-          onMouseEnter={() => setHoveredNav(4)}
-          onMouseLeave={() => setHoveredNav(null)}
-          onClick={() => {
-            if (!username) scrollToCourse();
-            else window.location.href = 'https://academy.kediritechnopark.com'
-          }}
-        >
-          {username ? 'MY ACADEMY' : 'ACADEMY'}
-        </a>
+        {username &&
+          <a
+            className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
+            onMouseEnter={() => setHoveredNav(3)}
+            onMouseLeave={() => setHoveredNav(null)}
+            onClick={() => {
+              navigate('/dashboard');
+            }}>
+            DASHBOARD
+          </a>
+        }
+        {!username &&
+          <>
+            <a
+              className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
+              onMouseEnter={() => setHoveredNav(3)}
+              onMouseLeave={() => setHoveredNav(null)}
+              onClick={() => {
+                navigate('/products');
+              }}
+            >
+              PRODUCTS
+            </a>
+            <a
+              className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}
+              onMouseEnter={() => setHoveredNav(4)}
+              onMouseLeave={() => setHoveredNav(null)}
+              onClick={() => {
+                scrollToCourse();
+              }}
+            >
+              ACADEMY
+            </a>
+          </>
+        }
       </nav>
 
       {/* Burger Menu Button */}
@@ -58,9 +71,9 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               <div className={styles.username}>{username}</div>
 
               <button className={styles.logoutButton} onClick={() => {
-                 navigate('/products');
+                navigate('/dashboard');
               }}>
-                MY PRODUCTS
+                DASHBOARD
               </button>
 
               <button className={styles.logoutButton} onClick={() => {

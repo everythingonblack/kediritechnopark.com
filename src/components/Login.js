@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const LoginRegister = ({setShowedModal}) => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState('login'); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -103,6 +105,7 @@ const LoginRegister = ({setShowedModal}) => {
           window.history.replaceState({}, '', newUrl);
           setShowedModal('product');
         } else {
+          navigate('/dashboard');
           window.location.reload();
         }
       } else {

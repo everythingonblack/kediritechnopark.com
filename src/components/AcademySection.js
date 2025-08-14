@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import styles from './Styles.module.css';
 
-const AcademySection = ({hoveredCard, setHoveredCard, setSelectedProduct, setShowedModal, courseSectionRef, setWillDo}) => {
+const AcademySection = ({setSelectedProduct, setShowedModal, courseSectionRef, setWillDo}) => {
   const [products, setProducts] = useState([]);
-
+  const [hoveredCard, setHoveredCard] = useState(null);
+  
   useEffect(() => {
     fetch('https://bot.kediritechnopark.com/webhook/store-production/products', {
       method: 'POST',

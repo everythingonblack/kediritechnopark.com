@@ -20,11 +20,7 @@ import ProductsPage from './components/pages/ProductsPage';
 import processProducts from './helper/processProducts';
 
 function HomePage({
-  hoveredCard,
-  setHoveredCard,
-  selectedProduct,
   setSelectedProduct,
-  showedModal,
   setShowedModal,
   productSectionRef,
   courseSectionRef,
@@ -38,16 +34,12 @@ function HomePage({
       <ServicesSection />
       <ProductSection
         productSectionRef={productSectionRef}
-        hoveredCard={hoveredCard}
-        setHoveredCard={setHoveredCard}
         setSelectedProduct={setSelectedProduct}
         setShowedModal={setShowedModal}
         setWillDo={setWillDo}
       />
       <AcademySection
         courseSectionRef={courseSectionRef}
-        hoveredCard={hoveredCard}
-        setHoveredCard={setHoveredCard}
         setSelectedProduct={setSelectedProduct}
         setShowedModal={setShowedModal}
         setWillDo={setWillDo}
@@ -76,7 +68,6 @@ function parseJwt(token) {
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [hoveredCard, setHoveredCard] = useState(null);
   const [subscriptions, setSubscriptions] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState({});
   const [showedModal, setShowedModal] = useState(null);
@@ -303,11 +294,7 @@ function App() {
             path="/"
             element={
               <HomePage
-                hoveredCard={hoveredCard}
-                setHoveredCard={setHoveredCard}
-                selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}
-                showedModal={showedModal}
                 setShowedModal={setShowedModal}
                 productSectionRef={productSectionRef}
                 courseSectionRef={courseSectionRef}
@@ -315,9 +302,11 @@ function App() {
               />
             }
           />
-          <Route path="/products" element={<ProductsPage subscriptions={subscriptions} />} />
+          <Route path="/dashboard" element={<ProductsPage 
+                setShowedModal={setShowedModal}
+ setSelectedProduct={setSelectedProduct} subscriptions={subscriptions} />} />
           <Route
-            path="/dashboard"
+            path="/admin"
             element={
               <Dashboard
                 setShowedModal={(e, productId) => {
