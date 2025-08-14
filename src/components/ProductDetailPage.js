@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './ProductDetail.module.css';
 
-const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal }) => {
+const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin, setShowedModal }) => {
   const [showChildSelector, setShowChildSelector] = useState(false);
   const [selectedChildIds, setSelectedChildIds] = useState([]);
 
@@ -138,6 +138,13 @@ const ProductDetail = ({ subscriptions, product, requestLogin, setShowedModal })
       window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&set_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
     }
   };
+
+  useEffect(() => {
+    if (willDo === 'checkout') {
+      onCheckout();
+    }
+    if(setWillDo) setWillDo(''); // Reset willDo after handling
+  }, []);
 
   const priceColor = product.price === 0 ? '#059669' : '#2563eb';
   console.log(product)

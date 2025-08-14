@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import styles from './Styles.module.css';
 
-const AcademySection = ({hoveredCard, setHoveredCard, setSelectedProduct, setShowedModal, courseSectionRef}) => {
+const AcademySection = ({hoveredCard, setHoveredCard, setSelectedProduct, setShowedModal, courseSectionRef, setWillDo}) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -68,6 +68,12 @@ const AcademySection = ({hoveredCard, setHoveredCard, setSelectedProduct, setSho
                           : `Rp ${product.price.toLocaleString('id-ID')}`}
                       </span>
                     </div>
+                    <button className="px-4 py-2 rounded-pill text-white" style={{ background: 'linear-gradient(to right, #6a59ff, #8261ee)', border: 'none' }} 
+                    onClick={() => {
+                    setSelectedProduct(product);
+                    setShowedModal('product');
+                    setWillDo('checkout');
+                  }}>Beli</button>
                   </div>
                 </div>
               ))}

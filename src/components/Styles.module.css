@@ -256,6 +256,8 @@
     padding: 1rem;
     padding-top: 0;
     text-align: left;
+    display: flex;
+    justify-content: space-between;
 }
 
 .courseCategory {

@@ -27,7 +27,8 @@ function HomePage({
   showedModal,
   setShowedModal,
   productSectionRef,
-  courseSectionRef
+  courseSectionRef,
+  setWillDo
 }) {
   return (
     <>
@@ -41,6 +42,7 @@ function HomePage({
         setHoveredCard={setHoveredCard}
         setSelectedProduct={setSelectedProduct}
         setShowedModal={setShowedModal}
+        setWillDo={setWillDo}
       />
       <AcademySection
         courseSectionRef={courseSectionRef}
@@ -48,6 +50,7 @@ function HomePage({
         setHoveredCard={setHoveredCard}
         setSelectedProduct={setSelectedProduct}
         setShowedModal={setShowedModal}
+        setWillDo={setWillDo}
       />
       <KnowledgeBaseSection />
       <ClientsSection />
@@ -84,6 +87,7 @@ function App() {
   const courseSectionRef = useRef(null);
 
   const [productModalRequest, setProductModalRequest] = useState(null);
+  const [willDo, setWillDo] = useState('');
 
 
   const scrollToProduct = () => {
@@ -307,6 +311,7 @@ function App() {
                 setShowedModal={setShowedModal}
                 productSectionRef={productSectionRef}
                 courseSectionRef={courseSectionRef}
+                setWillDo={setWillDo}
               />
             }
           />
@@ -348,6 +353,8 @@ function App() {
                   requestLogin={requestLogin}
                   product={selectedProduct}
                   setShowedModal={setShowedModal}
+                  willDo={willDo}
+                  setWillDo={setWillDo}
                 />
               )}
               {showedModal === 'create-item' && (
