@@ -24,8 +24,19 @@ function HomePage({
   setShowedModal,
   productSectionRef,
   courseSectionRef,
+  scrollToProduct,
+  scrollToCourse,
   setWillDo
 }) {
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+
+    if(tab === 'products') scrollToProduct();
+    if(tab === 'academy') scrollToCourse();
+  }, [productSectionRef, courseSectionRef]);
+
   return (
     <>
       <HeroSection />
@@ -46,6 +57,7 @@ function HomePage({
       />
       <KnowledgeBaseSection />
       <ClientsSection />
+      <Footer />
     </>
   );
 }
@@ -130,6 +142,7 @@ function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const modalType = params.get('modal');
+    const tab = params.get('tab');
     const productId = params.get('product_id');
     const authorizedUri = params.get('authorized_uri');
     const unauthorizedUri = params.get('unauthorized_uri');
@@ -148,6 +161,9 @@ function App() {
       }
       // Jika sudah login, tidak langsung fetch di sini — akan diproses saat subscriptions tersedia
     }
+
+    if(tab === 'products') scrollToProduct();
+    if(tab === 'academy') scrollToCourse();
   }, []);
 
   useEffect(() => {
@@ -299,12 +315,14 @@ function App() {
                 productSectionRef={productSectionRef}
                 courseSectionRef={courseSectionRef}
                 setWillDo={setWillDo}
+                scrollToProduct={scrollToProduct}
+                scrollToCourse={scrollToCourse}
               />
             }
           />
           <Route path="/dashboard" element={<ProductsPage 
                 setShowedModal={setShowedModal}
- setSelectedProduct={setSelectedProduct} subscriptions={subscriptions} />} />
+ setSelectedProduct={setSelectedProduct} subscriptions={subscriptions} setWillDo={setWillDo} />} />
           <Route
             path="/admin"
             element={
@@ -317,7 +335,6 @@ function App() {
             }
           />
         </Routes>
-        <Footer />
 
         {/* Modal */}
         {showedModal && (

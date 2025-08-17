@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ProductDetail.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin, setShowedModal }) => {
   const [showChildSelector, setShowChildSelector] = useState(false);
   const [selectedChildIds, setSelectedChildIds] = useState([]);
 
   const [matchingSubscriptions, setMatchingSubscriptions] = useState([]);
-  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(null);
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(0);
   const [showSubscriptionSelector, setShowSubscriptionSelector] = useState(false);
 
   const [showNamingInput, setShowNamingInput] = useState(false);
   const [customName, setCustomName] = useState('');
+
+  const navigate = useNavigate();
 
   const onCheckout = () => {
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
@@ -79,15 +82,14 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
   };
 
   const onConfirmChildren = () => {
-    if (matchingSubscriptions.length > 0) {
+    if (matchingSubscriptions.length > 0 && !product.executeCheckout) {
       setShowChildSelector(false);
       setShowSubscriptionSelector(true);
       return;
     }
-    else {
+    else if (!product.executeCheckout){
       setShowChildSelector(false);
       setShowNamingInput(true);
-      return;
     }
 
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
@@ -97,9 +99,9 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
       alert('Pilih minimal satu produk');
       return;
     }
-
+    const encodedName = encodeURIComponent(product.executeCheckout);
     const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) : JSON.stringify([product.id]);
-    window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
+    window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&set_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
   };
 
   const onFinalCheckoutNewProduct = () => {
@@ -193,7 +195,7 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
           {product.children.map(child => (
             <label key={child.id} className={styles.childProduct}>
               <input
-                type="checkbox"
+                type="radio"
                 value={child.id}
                 checked={selectedChildIds.includes(child.id)}
                 onChange={e => {
@@ -203,15 +205,16 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
                   );
                 }}
               />
-              &nbsp;{child.name} — Rp {parseInt(child.price || 0).toLocaleString('id-ID')}
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>
+              &nbsp;{child.name} 
+              </div>
+              <div>
+              Rp {parseInt(child.price || 0).toLocaleString('id-ID')}
+                </div>
+                </div>
             </label>
           ))}
-          <p>
-            <strong>Total Harga:</strong> Rp {selectedChildIds
-              .map(id => product.children.find(child => child.id === id)?.price || 0)
-              .reduce((a, b) => a + b, 0)
-              .toLocaleString('id-ID')}
-          </p>
           <div className={styles.buttonGroup}>
             <button className={styles.button} onClick={() => setShowChildSelector(false)}>
               Kembali
@@ -225,35 +228,23 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
 
       {showSubscriptionSelector && !showNamingInput && (
         <div className={styles.childSelector}>
-          <h5>Perpanjang {product.name.split('%%%')[0]} </h5>
-          {matchingSubscriptions.map(sub => (
-            <label key={sub.id} className={styles.childProduct}>
-              <input
-                type="radio"
-                name="subscription"
-                value={sub.id}
-                checked={selectedSubscriptionId == sub.id}
-                onChange={() => { setSelectedSubscriptionId(sub.id); setCustomName(sub.product_name) }}
-              />
-              &nbsp;{sub.product_name.split('%%%')[0]}
-            </label>
-          ))}
-          <h6>Atau buat baru</h6>
-          <label className={styles.childProduct}>
-            <input
-              type="radio"
-              name="subscription"
-              checked={selectedSubscriptionId === 0}
-              onChange={() => {setSelectedSubscriptionId(0); console.log(product.id)}}
-            />
-            &nbsp;Buat {product.name.split('%%%')[0]} baru
+          <h5>Kamu sudah punya produk ini</h5>
+          <div className={styles.childProduct} onClick={()=>{setShowedModal('');navigate('/dashboard')}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>Perpanjang produk ini</div>
+              <div>➔</div>
+            </div>
+          </div>
+          <h6>Atau</h6>
+          <label className={styles.childProduct} onClick={()=>{setSelectedSubscriptionId(0); onConfirmSelector();}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>Tambah {product.name.split('%%%')[0]} baru</div>
+              <div>➔</div>
+            </div>
           </label>
           <div className={styles.buttonGroup}>
             <button className={styles.button} onClick={() => setShowSubscriptionSelector(false)}>
               Kembali
-            </button>
-            <button className={styles.button} onClick={onConfirmSelector}>
-              Lanjut ke Checkout
             </button>
           </div>
         </div>

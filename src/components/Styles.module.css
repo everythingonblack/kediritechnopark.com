@@ -304,7 +304,7 @@
 }
 
 .currentPrice {
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #2563eb;
 }
@@ -669,4 +669,140 @@
 .logo img {
   max-width: 150px; /* biar logo tidak terlalu besar */
   height: auto;
+}
+
+/* Navigation Tabs */
+.navTabs {
+  display: flex;
+  align-items: center;
+  background-color: #2a4fd6; /* blue bar like screenshot */
+  padding: 0;
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+}
+
+.floatMenuItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffffcc; /* light white text */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.floatMenuItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.floatMenuItemActive {
+  background-color: #ffffff;
+  color: #2a4fd6; /* active text color */
+  font-weight: 600;
+}
+
+.floatMenuTitle {
+  display: inline-block;
+}
+
+.floatMenuIcon {
+  stroke-width: 2;
+}
+
+/* Sections */
+.Section {
+  padding: 24px;
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Settings Page Layout */
+.profileSection {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.profileHeading {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.sectionDivider {
+  height: 2px;
+  background-color: #2a4fd6;
+  width: 40px;
+  margin: 8px 0 20px 0;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background-color: #f6f9fc;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.fullWidth {
+  grid-column: span 2;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.inputField,
+.selectField {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+}
+
+.selectField {
+  appearance: none;
+}
+
+.saveButton {
+  background-color: #2a4fd6;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: background 0.2s ease;
+}
+
+.saveButton:hover {
+  background-color: #223fa9;
+}
+
+/* Change Password Section */
+.changePasswordSection {
+  margin-top: 32px;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
 }
