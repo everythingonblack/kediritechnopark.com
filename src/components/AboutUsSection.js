@@ -9,7 +9,7 @@ import useInView from '../hooks/useInView';
 const AboutUsSection = () => {
   const { ref, inView } = useInView();
   return (
-    <section id="about" ref={ref} className={`${styles.aboutSection} ${shared.revealSection} ${inView ? shared.isVisible : ''}`}>
+    <section id="about" ref={ref} style={{scrollMarginTop: '65px'}} className={`${styles.aboutSection} ${shared.revealSection} ${inView ? shared.isVisible : ''}`}>
       <AnimatedBackground /> {/* Komponen animasi sebagai latar belakang */}
       <div className={styles.contentWrapper}>
         <Container>

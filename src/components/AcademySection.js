@@ -43,7 +43,7 @@ const AcademySection = ({setSelectedProduct, setShowedModal, courseSectionRef, s
   const { ref, inView } = useInView();
   return (
 
-    <section id="academy" className={`services pt-5 ${styles.academySection} ${styles.revealSection} ${inView ? styles.isVisible : ''}`} ref={(el) => {
+    <section id="academy" style={{scrollMarginTop: '65px' }}  className={`services pt-5 ${styles.academySection} ${styles.revealSection} ${inView ? styles.isVisible : ''}`} ref={(el) => {
       if (typeof courseSectionRef === 'function') courseSectionRef(el);
       if (ref) ref.current = el;
     }}>

@@ -116,7 +116,7 @@ const FAQSection = () => {
   ];
 
   return (
-    <section id="faq" className={styles.faqSection}>
+    <section id="faq" style={{scrollMarginTop: '65px'}} className={styles.faqSection}>
       <Container>
         <Row>
           <Col>

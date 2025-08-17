@@ -20,7 +20,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
     navigate('/');
     setTimeout(() => {
       const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
       // Backward compatibility with refs passed from App for products/academy
       if (id === 'products' && typeof scrollToProduct === 'function') scrollToProduct();
       if (id === 'academy' && typeof scrollToCourse === 'function') scrollToCourse();
@@ -28,48 +28,50 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
   };
 
   return (
-      <header className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''}`}>
-        <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
+    <header className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''}`}>
+      <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
 
       {/* Desktop Navigation */}
       <nav className={styles.nav}>
-        <a
-          className={`${styles.navLink} ${hoveredNav === 2 ? styles.navLinkHover : ''}`}
-          onMouseEnter={() => setHoveredNav(2)}
-          onMouseLeave={() => setHoveredNav(null)}
-          onClick={() => navigate('/')}
-        >
-          Home
-        </a>
-        <a
-          className={`${styles.navLink} ${hoveredNav === 21 ? styles.navLinkHover : ''}`}
-          onMouseEnter={() => setHoveredNav(21)}
-          onMouseLeave={() => setHoveredNav(null)}
-          onClick={() => scrollToId('about')}
-        >
-          About
-        </a>
-        <a
-          className={`${styles.navLink} ${hoveredNav === 22 ? styles.navLinkHover : ''}`}
-          onMouseEnter={() => setHoveredNav(22)}
-          onMouseLeave={() => setHoveredNav(null)}
-          onClick={() => scrollToId('services')}
-        >
-          Services
-        </a>
         {username &&
-          <a
-            className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
-            onMouseEnter={() => setHoveredNav(3)}
-            onMouseLeave={() => setHoveredNav(null)}
-            onClick={() => {
-              navigate('/dashboard');
-            }}>
-            Dashboard
-          </a>
+          <>
+            <a
+              className={`${styles.navLink} ${hoveredNav === 2 ? styles.navLinkHover : ''}`}
+              onMouseEnter={() => setHoveredNav(2)}
+              onMouseLeave={() => setHoveredNav(null)}
+              onClick={() => navigate('/')}
+            >
+              Home
+            </a>
+            <a
+              className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
+              onMouseEnter={() => setHoveredNav(3)}
+              onMouseLeave={() => setHoveredNav(null)}
+              onClick={() => {
+                navigate('/dashboard');
+              }}>
+              Dashboard
+            </a>
+          </>
         }
         {!username &&
           <>
+            <a
+              className={`${styles.navLink} ${hoveredNav === 21 ? styles.navLinkHover : ''}`}
+              onMouseEnter={() => setHoveredNav(21)}
+              onMouseLeave={() => setHoveredNav(null)}
+              onClick={() => scrollToId('about')}
+            >
+              About
+            </a>
+            <a
+              className={`${styles.navLink} ${hoveredNav === 22 ? styles.navLinkHover : ''}`}
+              onMouseEnter={() => setHoveredNav(22)}
+              onMouseLeave={() => setHoveredNav(null)}
+              onClick={() => scrollToId('services')}
+            >
+              Services
+            </a>
             <a
               className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
               onMouseEnter={() => setHoveredNav(3)}
@@ -109,7 +111,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
           {username ? (
             <>
               <div className={styles.username}>{username}</div>
-              <button onClick={() => { setMenuOpen(false); navigate('/'); }}>Home</button>
+              {/* <button onClick={() => { setMenuOpen(false); navigate('/'); }}>Home</button> */}
               <button onClick={() => { setMenuOpen(false); scrollToId('about'); }}>About</button>
               <button onClick={() => { setMenuOpen(false); scrollToId('services'); }}>Services</button>
               <button onClick={() => { setMenuOpen(false); scrollToId('products'); }}>Products</button>
@@ -164,7 +166,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
           </button>
         )}
       </div>
-      </header>
+    </header>
   );
 };
 

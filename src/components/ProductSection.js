@@ -49,7 +49,7 @@ const ProductSection = ({ setSelectedProduct, setShowedModal, productSectionRef,
 
   const { ref, inView } = useInView();
   return (
-    <section id="products" className={`${styles.productSection} ${shared.revealSection} ${inView ? shared.isVisible : ''}`} ref={(el) => {
+    <section id="products" style={{scrollMarginTop: '65px' }} className={`${styles.productSection} ${shared.revealSection} ${inView ? shared.isVisible : ''}`} ref={(el) => {
       if (typeof productSectionRef === 'function') productSectionRef(el);
       if (ref) ref.current = el;
     }}>

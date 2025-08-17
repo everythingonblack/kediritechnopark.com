@@ -2,7 +2,6 @@
   padding: 80px 0; /* Ditinggikan dari 60px */
   position: relative;
   background-color: #0f172a; /* Latar belakang biru gelap (slate-900) */
-  overflow: hidden; /* Mencegah canvas keluar dari section */
 }
 
 /* Menghapus .blueprintGrid */

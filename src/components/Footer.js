@@ -52,18 +52,7 @@ const Footer = () => {
               </div>
             </div>
           </Col>
-          
-          <Col lg={3} md={6} className={styles.footerColumn}>
-            <h3 className={styles.footerTitle}>Quick Links</h3>
-            <ul className={styles.footerLinks}>
-              <li><a href="#home">Home</a></li>
-              <li><a href="#products">Products</a></li>
-              <li><a href="#academy">Academy</a></li>
-              <li><a href="#about">About Us</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-          </Col>
-          
+
           <Col lg={3} md={6} className={styles.footerColumn}>
             <h3 className={styles.footerTitle}>Newsletter</h3>
             <div className={styles.newsletter}>

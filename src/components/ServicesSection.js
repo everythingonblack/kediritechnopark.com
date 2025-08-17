@@ -29,7 +29,7 @@ const services = [
 const ServicesSection = () => {
   const { ref, inView } = useInView();
   return (
-    <section id="services" ref={ref} className={`${styles.blueprintContainer} ${shared.revealSection} ${inView ? shared.isVisible : ''}`}>
+    <section id="services" ref={ref} style={{scrollMarginTop: '65px'}} className={`${styles.blueprintContainer} ${shared.revealSection} ${inView ? shared.isVisible : ''}`}>
       <div className={styles.blueprintGrid}></div>
       <div className={styles.contentWrapper}>
         <Container>
