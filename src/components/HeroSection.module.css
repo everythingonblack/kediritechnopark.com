@@ -198,22 +198,41 @@
 }
 
 @media (max-width: 575.98px) {
-  .hero { padding-top: 1.25rem; }
+  .hero { padding-top: 1rem; }
   .ctaGroup { display: grid; gap: 8px; }
   .ctaPrimary, .ctaSecondary { width: 100% !important; text-align: center; }
+  .copyWrap { max-width: 100%; padding: 0 10px; }
+  .title { font-size: clamp(1.3rem, 2.5vw + 1rem, 1.8rem); }
+  .lead { font-size: clamp(0.9rem, 0.5vw + 0.8rem, 1rem); }
 }
 
 @media (max-width: 767.98px) {
   .imageWrap::before,
   .imageWrap::after { display: none; }
-  .title { font-size: clamp(1.4rem, 1.8vw + 1rem, 2.1rem); line-height: 1.12; }
+  .title { font-size: clamp(1.4rem, 2vw + 1rem, 2.1rem); line-height: 1.12; }
   .lead { font-size: clamp(0.93rem, 0.4vw + 0.84rem, 1.03rem); }
   .bulletItem { font-size: 0.92rem; }
   .mesh, .grid { display: none; }
+  .copyWrap { max-width: 100%; padding: 0 15px; }
+  .imageWrap { max-width: 100%; }
+  .imageFrame { border-radius: calc(var(--radius-2xl) + 2px); }
+  .heroImage { border-radius: calc(var(--radius-2xl) - 6px); }
 }
 
 .imageFrame:hover { box-shadow: none; transform: none; }
 
 @media (min-width: 1400px) {
   .imageWrap { max-width: 720px; }
+}
+
+@media (max-width: 400px) {
+  .hero { padding-top: 0.8rem; }
+  .title { font-size: clamp(1.2rem, 3vw + 0.9rem, 1.7rem); }
+  .lead { font-size: clamp(0.85rem, 0.5vw + 0.75rem, 0.95rem); }
+  .ctaGroup { gap: 6px; }
+  .ctaPrimary, .ctaSecondary { 
+    padding: 0.4rem 0.7rem !important;
+    font-size: 0.9rem;
+  }
+  .copyWrap { padding: 0 5px; }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './ProductCard.module.css';
 
-const ProductCard = ({ product, onCardClick, isCenter, canHover }) => {
+const ProductCard = ({ product, onCardClick, isCenter, canHover, onCollapse }) => {
   return (
     <div
       className={`${styles.card} ${isCenter ? styles.isCenter : ''} ${canHover ? styles.canHover : ''}`}
@@ -16,10 +16,13 @@ const ProductCard = ({ product, onCardClick, isCenter, canHover }) => {
       <div
         className={styles.overlay}
         onClick={(e) => {
-          if (isCenter) {
-            // Clicks on overlay open detail; prevent parent selection
-            e.stopPropagation();
-            onCardClick && onCardClick(product);
+          // Collapse overlay when clicking on the overlay background (not buttons)
+          if (isCenter && canHover && onCollapse) {
+            // Check if the click target is the overlay itself, not a button
+            if (e.target === e.currentTarget) {
+              e.stopPropagation();
+              onCollapse();
+            }
           }
         }}
       >

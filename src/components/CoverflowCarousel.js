@@ -71,6 +71,15 @@ const CoverflowCarousel = ({ products, onCardClick }) => {
     goToProduct(index, dir);
   };
 
+  // Collapse overlay for center card
+  const collapseOverlay = () => {
+    // Reset animation state to force collapse
+    setAnimationState('spread');
+    setTimeout(() => {
+      setAnimationState('ready');
+    }, 50);
+  };
+
   // Initialize carousel with spread effect when products are available
   useEffect(() => {
     if (!products || products.length === 0) return;
@@ -159,7 +168,15 @@ const CoverflowCarousel = ({ products, onCardClick }) => {
                 animationState === 'initial' ? styles.initial :
                 animationState === 'spread' ? styles.spread : ''
               }`}
-              onClick={() => { goToProduct(productIndex, position > 0 ? 'right' : (position < 0 ? 'left' : null)); }}
+              onClick={() => { 
+                // Only trigger navigation if this is not the center card
+                // or if it's the center card but not in hover state (overlay not visible)
+                const isCenter = position === 0;
+                const canHover = isCenter && animationState === 'ready' && !shiftDirection && !isDragging;
+                if (position !== 0 || (position === 0 && (!canHover || animationState !== 'ready' || shiftDirection || isDragging))) {
+                  goToProduct(productIndex, position > 0 ? 'right' : (position < 0 ? 'left' : null));
+                }
+              }}
             >
               <div className={styles.cardShadow} aria-hidden="true"></div>
               <div className={styles.cardWrapper}>
@@ -168,6 +185,7 @@ const CoverflowCarousel = ({ products, onCardClick }) => {
                   onCardClick={(p) => { onCardClick && onCardClick(p); }}
                   isCenter={position === 0}
                   canHover={position === 0 && animationState === 'ready' && !shiftDirection && !isDragging}
+                  onCollapse={position === 0 ? collapseOverlay : undefined}
                 />
               </div>
             </div>

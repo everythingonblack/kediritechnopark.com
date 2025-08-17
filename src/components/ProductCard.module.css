@@ -132,7 +132,40 @@
   .description { -webkit-line-clamp: 2; }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
   .title { font-size: 0.9rem; }
-  .overlay { --overlay-collapsed: 56px; }
+  .overlay { --overlay-collapsed: 60px; }
+  .description { font-size: 0.8rem; }
+  .buttonGroup { gap: 6px; }
+  .detailButton,
+  .buyButton { 
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .title { font-size: 0.85rem; }
+  .overlay { --overlay-collapsed: 50px; }
+  .overlayInner { padding: 10px 12px 12px; }
+  .description { font-size: 0.75rem; margin: 6px 0 8px; }
+  .buttonGroup { gap: 5px; }
+  .detailButton,
+  .buyButton { 
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .title { font-size: 0.8rem; }
+  .overlay { --overlay-collapsed: 45px; }
+  .overlayInner { padding: 8px 10px 10px; }
+  .description { font-size: 0.7rem; margin: 4px 0 6px; }
+  .buttonGroup { gap: 4px; }
+  .detailButton,
+  .buyButton { 
+    padding: 3px 6px;
+    font-size: 0.65rem;
+  }
 }

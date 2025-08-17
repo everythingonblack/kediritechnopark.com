@@ -152,6 +152,11 @@
     margin-bottom: 25px;
   }
   
+  .sectionHeader p {
+    max-width: 100%;
+    padding: 0 15px;
+  }
+  
   .filterWrapper {
     gap: 8px;
   }
@@ -179,6 +184,11 @@
   
   .sectionHeader {
     margin-bottom: 25px;
+    padding: 0 10px;
+  }
+  
+  .sectionTitle {
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
   }
   
   .sectionHeader p {
@@ -187,6 +197,7 @@
   
   .filterContainer {
     margin-bottom: 20px;
+    padding: 0 10px;
   }
   
   .filterWrapper {
@@ -216,14 +227,33 @@
   
   .sectionHeader {
     margin-bottom: 20px;
+    padding: 0 15px;
+  }
+  
+  .sectionTitle {
+    font-size: clamp(1.3rem, 5vw, 1.7rem);
   }
   
   .sectionHeader p {
     font-size: 0.9rem;
   }
   
+  .filterContainer {
+    margin-bottom: 15px;
+    padding: 0 15px;
+  }
+  
+  .filterWrapper {
+    gap: 5px;
+  }
+  
+  .filterBtn {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+  
   .carouselContainer {
-    padding: 0 35px;
+    padding: 0 30px;
     min-height: 320px;
   }
   
@@ -234,8 +264,39 @@
 }
 
 @media (max-width: 400px) {
+  .productSection {
+    padding: 25px 0;
+  }
+  
+  .sectionHeader {
+    margin-bottom: 15px;
+    padding: 0 10px;
+  }
+  
+  .sectionTitle {
+    font-size: clamp(1.2rem, 6vw, 1.6rem);
+  }
+  
+  .sectionHeader p {
+    font-size: 0.85rem;
+  }
+  
+  .filterContainer {
+    margin-bottom: 12px;
+    padding: 0 10px;
+  }
+  
+  .filterWrapper {
+    gap: 4px;
+  }
+  
+  .filterBtn {
+    padding: 3px 6px;
+    font-size: 0.65rem;
+  }
+  
   .carouselContainer {
-    padding: 0 30px;
+    padding: 0 25px;
     min-height: 300px;
   }
   

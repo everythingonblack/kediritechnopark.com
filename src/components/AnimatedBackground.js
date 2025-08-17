@@ -9,10 +9,27 @@ const AnimatedBackground = () => {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
     let particles = [];
-    const particleCount = 70;
+
+    // Determine particle count based on screen size
+    const getParticleCount = () => {
+      const width = window.innerWidth;
+      if (width <= 400) return 30;  // Very small screens
+      if (width <= 576) return 40;  // Small screens
+      if (width <= 768) return 50;  // Medium screens
+      return 70;                    // Large screens
+    };
 
     function Particle(x, y, vx, vy) {
-      this.x = x; this.y = y; this.vx = vx; this.vy = vy; this.radius = 1.5;
+      this.x = x; this.y = y; this.vx = vx; this.vy = vy; 
+      
+      // Adjust particle radius based on screen size
+      if (window.innerWidth <= 400) {
+        this.radius = 1.0;  // Smaller radius for very small screens
+      } else if (window.innerWidth <= 576) {
+        this.radius = 1.2;  // Medium radius for small screens
+      } else {
+        this.radius = 1.5;  // Default radius for larger screens
+      }
     }
 
     const setupCanvas = () => {
@@ -31,6 +48,9 @@ const AnimatedBackground = () => {
 
       ctx.scale(dpr, dpr);
 
+      // Get particle count based on current screen size
+      const particleCount = getParticleCount();
+
       particles = [];
       for (let i = 0; i < particleCount; i++) {
         particles.push(new Particle(Math.random() * cssWidth, Math.random() * cssHeight, (Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5));
@@ -40,7 +60,14 @@ const AnimatedBackground = () => {
     function connectParticles() {
       const cssWidth = canvas.clientWidth;
       const cssHeight = canvas.clientHeight;
-      const connectionDistance = 90;
+      
+      // Adjust connection distance based on screen size
+      let connectionDistance = 90;
+      if (window.innerWidth <= 400) {
+        connectionDistance = 60;  // Smaller connection distance for very small screens
+      } else if (window.innerWidth <= 576) {
+        connectionDistance = 70;  // Medium connection distance for small screens
+      }
 
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -83,6 +110,14 @@ const AnimatedBackground = () => {
       const cssHeight = canvas.clientHeight;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Adjust animation speed based on screen size
+      let speedFactor = 1.0;
+      if (window.innerWidth <= 400) {
+        speedFactor = 0.7;  // Slower animation for very small screens
+      } else if (window.innerWidth <= 576) {
+        speedFactor = 0.8;  // Slightly slower animation for small screens
+      }
+
       for (const p of particles) {
         // LOGIKA BARU: Partikel tembus (wrapping) bukan memantul (bounce)
         if (p.x > cssWidth + p.radius) p.x = -p.radius;
@@ -91,8 +126,8 @@ const AnimatedBackground = () => {
         if (p.y > cssHeight + p.radius) p.y = -p.radius;
         else if (p.y < -p.radius) p.y = cssHeight + p.radius;
         
-        p.x += p.vx;
-        p.y += p.vy;
+        p.x += p.vx * speedFactor;
+        p.y += p.vy * speedFactor;
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -106,11 +141,17 @@ const AnimatedBackground = () => {
 
     setupCanvas();
     animate();
-    window.addEventListener('resize', setupCanvas);
+    
+    // Handle resize events to adjust particle count
+    const handleResize = () => {
+      setupCanvas();
+    };
+    
+    window.addEventListener('resize', handleResize);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', setupCanvas);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 

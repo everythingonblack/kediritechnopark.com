@@ -661,16 +661,19 @@
 /* Responsive Styles */
 @media (max-width: 800px) {
     .modalBody {
-        width: 80%;
+        width: 85%;
+        max-width: 90%;
+        margin: 0 15px;
     }
 
     .header {
-        padding: 14px 2rem;
+        padding: 14px 1.5rem;
     }
 
     .heroContainer {
         grid-template-columns: 1fr;
         text-align: center;
+        gap: 2rem;
     }
 
     .ctaTitle,
@@ -685,7 +688,7 @@
 
     .ctaCard,
     .Section {
-        padding: 2rem 0.8rem;
+        padding: 2rem 1rem;
         background-color: #f8fafc;
     }
 
@@ -695,7 +698,7 @@
 
     .ctaContainer,
     .coursesGrid {
-        grid-template-columns: repeat(auto-fit, minmax(173px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 0.8rem;
     }
 
@@ -729,6 +732,7 @@
   display: none;
   font-size: 28px;
   cursor: pointer;
+  user-select: none;
 }
 
 .mobileMenu {
@@ -736,7 +740,7 @@
 }
 
 /* Tampilkan burger dan menu di mobile */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
 .nav {
     display: none;
 }
@@ -757,11 +761,12 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 12px;
-    z-index: 10;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     gap: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
   }
 
   .mobileMenu button {
@@ -771,6 +776,8 @@
     color: white;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 0.9rem;
+    text-align: left;
   }
 
   .mobileMenu button:hover {
@@ -781,6 +788,108 @@
     font-weight: bold;
     color: #2563eb;
     margin-bottom: 4px;
+  }
+  
+  .logoutButton {
+    background-color: transparent;
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .logoutButton:hover {
+    background-color: #2563eb;
+    color: white;
+  }
+}
+
+@media (max-width: 576px) {
+  .header {
+    padding: 12px 1rem;
+  }
+  
+  .Section {
+    padding: 1.5rem 0.8rem;
+  }
+  
+  .coursesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .ctaContainer {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .featuresList {
+    gap: 1.5rem;
+  }
+  
+  .featureItem {
+    gap: 1rem;
+  }
+  
+  .featureIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .featureTitle {
+    font-size: 1.1rem;
+  }
+  
+  .mobileMenu {
+    right: 15px;
+    top: 55px;
+    min-width: 140px;
+  }
+  
+  .mobileMenu button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .Section {
+    padding: 1.2rem 0.6rem;
+  }
+  
+  .featureItem {
+    gap: 0.8rem;
+  }
+  
+  .featureIcon {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+  
+  .featureTitle {
+    font-size: 1rem;
+  }
+  
+  .featureDescription {
+    font-size: 0.9rem;
+  }
+  
+  .mobileMenu {
+    right: 10px;
+    top: 50px;
+    min-width: 130px;
+    padding: 10px;
+  }
+  
+  .mobileMenu button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
   }
 }
 

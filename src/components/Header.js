@@ -27,6 +27,18 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
     }, 0);
   };
 
+  // Close mobile menu when window is resized to desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 600) {
+        setMenuOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <header className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''}`}>
       <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
@@ -39,7 +51,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               className={`${styles.navLink} ${hoveredNav === 2 ? styles.navLinkHover : ''}`}
               onMouseEnter={() => setHoveredNav(2)}
               onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => navigate('/')}
+              onClick={() => { navigate('/'); setMenuOpen(false); }}
             >
               Home
             </a>
@@ -49,6 +61,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               onMouseLeave={() => setHoveredNav(null)}
               onClick={() => {
                 navigate('/dashboard');
+                setMenuOpen(false);
               }}>
               Dashboard
             </a>
@@ -60,7 +73,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               className={`${styles.navLink} ${hoveredNav === 21 ? styles.navLinkHover : ''}`}
               onMouseEnter={() => setHoveredNav(21)}
               onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => scrollToId('about')}
+              onClick={() => { scrollToId('about'); setMenuOpen(false); }}
             >
               About
             </a>
@@ -68,7 +81,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               className={`${styles.navLink} ${hoveredNav === 22 ? styles.navLinkHover : ''}`}
               onMouseEnter={() => setHoveredNav(22)}
               onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => scrollToId('services')}
+              onClick={() => { scrollToId('services'); setMenuOpen(false); }}
             >
               Services
             </a>
@@ -76,7 +89,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
               onMouseEnter={() => setHoveredNav(3)}
               onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => scrollToId('products')}
+              onClick={() => { scrollToId('products'); setMenuOpen(false); }}
             >
               Products
             </a>
@@ -84,7 +97,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               className={`${styles.navLink} ${hoveredNav === 4 ? styles.navLinkHover : ''}`}
               onMouseEnter={() => setHoveredNav(4)}
               onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => scrollToId('academy')}
+              onClick={() => { scrollToId('academy'); setMenuOpen(false); }}
             >
               Academy
             </a>
@@ -92,7 +105,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               className={`${styles.navLink} ${hoveredNav === 5 ? styles.navLinkHover : ''}`}
               onMouseEnter={() => setHoveredNav(5)}
               onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => scrollToId('faq')}
+              onClick={() => { scrollToId('faq'); setMenuOpen(false); }}
             >
               FAQ
             </a>
@@ -111,7 +124,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
           {username ? (
             <>
               <div className={styles.username}>{username}</div>
-              {/* <button onClick={() => { setMenuOpen(false); navigate('/'); }}>Home</button> */}
+              <button onClick={() => { setMenuOpen(false); navigate('/'); }}>Home</button>
               <button onClick={() => { setMenuOpen(false); scrollToId('about'); }}>About</button>
               <button onClick={() => { setMenuOpen(false); scrollToId('services'); }}>Services</button>
               <button onClick={() => { setMenuOpen(false); scrollToId('products'); }}>Products</button>
@@ -119,6 +132,7 @@ const Header = ({ username, scrollToProduct, scrollToCourse, setShowedModal, han
               <button onClick={() => { setMenuOpen(false); scrollToId('faq'); }}>FAQ</button>
               <button className={styles.logoutButton} onClick={() => {
                 navigate('/dashboard');
+                setMenuOpen(false);
               }}>
                 Dashboard
               </button>
