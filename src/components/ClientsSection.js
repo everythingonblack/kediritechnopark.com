@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Image } from 'react-bootstrap';
 import styles from './Styles.module.css';
+import useInView from '../hooks/useInView';
 
 const ClientsSection = () => {
   const logos = [
@@ -10,8 +11,9 @@ const ClientsSection = () => {
     'psi.png',
   ];
 
+  const { ref, inView } = useInView();
   return (
-    <section id="clients" className="the-clients section py-5">
+    <section id="clients" ref={ref} className={`the-clients section py-5 ${styles.revealSection} ${inView ? styles.isVisible : ''}`}>
       <Container>
         <Row>
           <Col>

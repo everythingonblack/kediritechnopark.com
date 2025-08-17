@@ -23,15 +23,28 @@
 }
 
 .header {
-    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     padding: 14px 6rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* position: sticky; */
-    top: 0;
-    z-index: 1000;
+    background: transparent; /* blend with top page */
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: none;
+    box-shadow: none;
+}
+
+.headerScrolled {
+    background: rgba(255, 255, 255, 0.65);
+    border-bottom: 1px solid rgba(203, 213, 225, 0.8);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+@supports not ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+  .header { /* revert: no backdrop effects */ }
 }
 
 .logo {
@@ -83,12 +96,19 @@
 }
 
 .loginButton {
-    background-color: transparent;
-    color: #64748b;
+    background-color: #2563eb; /* brand color */
+    color: #ffffff;
     border: none;
     font-size: 0.9rem;
     cursor: pointer;
     padding: 0.5rem 1rem;
+    border-radius: 10px; /* rounded corner */
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.loginButton:hover {
+    background-color: #1e40af;
 }
 
 /* Hero Section */
@@ -175,6 +195,53 @@
     margin: 0 auto;
 }
 
+.sectionHeader {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.sectionEyebrow {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #1e40af;
+    background: #e8f0ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 999px;
+    margin-bottom: 8px;
+}
+
+.sectionTitle {
+    margin: 4px 0 6px 0;
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .sectionTitle { font-size: 1.5rem; }
+}
+
+.sectionRule {
+    width: 72px;
+    height: 4px;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    border-radius: 999px;
+    margin: 8px 0 12px 0;
+}
+
+.sectionSubtitle {
+    color: #475569;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0;
+}
+
 .coursesTitle {
     font-size: 2.5rem;
     font-weight: bold;
@@ -184,15 +251,23 @@
 
 .coursesGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .coursesGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 992px) {
+  .coursesGrid { grid-template-columns: repeat(3, 1fr); }
 }
 .courseCard {
     background-color: white;
-    border-radius: 1rem;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb; /* thin border, no base shadow */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
@@ -210,13 +285,14 @@
 
 
 .courseCardHover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    border-color: #d1d5db;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
 }
 
 .courseImage {
     width: 100%;
-    height: 200px;
+    height: 160px;
     background-color: white;
     position: relative;
     display: flex;
@@ -225,7 +301,7 @@
     color: #64748b;
     
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: cover;
     background-position: center;
 }
 
@@ -242,8 +318,15 @@
 }
 
 .courseContentTop {
-    padding: 1rem 1rem 0rem;
+    padding: 0.75rem 0.75rem 0rem;
     text-align: left;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
 }
 
 .courseContentTop p {
@@ -253,11 +336,12 @@
 
 
 .courseContentBottom {
-    padding: 1rem;
-    padding-top: 0;
+    padding: 0.75rem;
+    padding-top: 0.5rem;
     text-align: left;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .courseCategory {
@@ -269,26 +353,59 @@
 }
 
 .courseTitle {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #1e293b;
-    margin-bottom: 1rem;
-    margin-top: 0;
+    flex: 1 1 auto;
+    min-width: 0; /* allow ellipsis shrink in flex */
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0; /* in-row with pills */
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.courseStats {
+.pillRow {
     display: flex;
-    justify-content: space-between;
+    gap: 0.4rem;
+    flex-wrap: wrap;
     align-items: center;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    color: #64748b;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    margin-left: 0.5rem;
 }
 
-.courseStat {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
+.pill {
+    padding: 2px 8px;
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .courseTitle { font-size: 0.95rem; }
+  .pill { font-size: 10px; }
+}
+
+.pillModules {
+    background-color: #e8f0ff;
+    border-color: #c7d2fe;
+    color: #1e40af;
+}
+
+.pillSessions {
+    background-color: #ecfdf5;
+    border-color: #bbf7d0;
+    color: #065f46;
+}
+
+.titleSeparator {
+    border-top: 1px dashed #e5e7eb;
+    margin: 0.5rem 0 0.5rem;
 }
 
 .coursePrice {
@@ -310,9 +427,41 @@
 }
 
 .freePrice {
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     font-weight: bold;
     color: #059669;
+}
+
+/* Compact description */
+.courseDesc {
+    margin: 0.25rem 0 0.25rem;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.enrollButton {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 0.55rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.05s ease;
+}
+
+.enrollButton:hover {
+    background-color: #1e40af;
+}
+
+.enrollButton:active {
+    transform: translateY(1px);
 }
 
 .featuresContainer {
@@ -341,6 +490,28 @@
 .featuresList {
     display: grid;
     gap: 2rem;
+}
+
+/* Spacing for Academy section to avoid tight gap with FAQ */
+.academySection {
+    padding-bottom: 3rem;
+}
+
+@media (max-width: 600px) {
+  .academySection { padding-bottom: 2rem; }
+}
+
+/* Reveal on scroll/load */
+.revealSection {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 480ms ease-out, transform 480ms ease-out;
+    will-change: opacity, transform;
+}
+
+.isVisible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .featureItem {
@@ -490,16 +661,19 @@
 /* Responsive Styles */
 @media (max-width: 800px) {
     .modalBody {
-        width: 80%;
+        width: 85%;
+        max-width: 90%;
+        margin: 0 15px;
     }
 
     .header {
-        padding: 14px 2rem;
+        padding: 14px 1.5rem;
     }
 
     .heroContainer {
         grid-template-columns: 1fr;
         text-align: center;
+        gap: 2rem;
     }
 
     .ctaTitle,
@@ -514,7 +688,7 @@
 
     .ctaCard,
     .Section {
-        padding: 2rem 0.8rem;
+        padding: 2rem 1rem;
         background-color: #f8fafc;
     }
 
@@ -524,7 +698,7 @@
 
     .ctaContainer,
     .coursesGrid {
-        grid-template-columns: repeat(auto-fit, minmax(173px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 0.8rem;
     }
 
@@ -558,6 +732,7 @@
   display: none;
   font-size: 28px;
   cursor: pointer;
+  user-select: none;
 }
 
 .mobileMenu {
@@ -565,7 +740,7 @@
 }
 
 /* Tampilkan burger dan menu di mobile */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
 .nav {
     display: none;
 }
@@ -586,11 +761,12 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 12px;
-    z-index: 10;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     gap: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
   }
 
   .mobileMenu button {
@@ -600,6 +776,8 @@
     color: white;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 0.9rem;
+    text-align: left;
   }
 
   .mobileMenu button:hover {
@@ -610,6 +788,108 @@
     font-weight: bold;
     color: #2563eb;
     margin-bottom: 4px;
+  }
+  
+  .logoutButton {
+    background-color: transparent;
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .logoutButton:hover {
+    background-color: #2563eb;
+    color: white;
+  }
+}
+
+@media (max-width: 576px) {
+  .header {
+    padding: 12px 1rem;
+  }
+  
+  .Section {
+    padding: 1.5rem 0.8rem;
+  }
+  
+  .coursesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .ctaContainer {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .featuresList {
+    gap: 1.5rem;
+  }
+  
+  .featureItem {
+    gap: 1rem;
+  }
+  
+  .featureIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .featureTitle {
+    font-size: 1.1rem;
+  }
+  
+  .mobileMenu {
+    right: 15px;
+    top: 55px;
+    min-width: 140px;
+  }
+  
+  .mobileMenu button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .Section {
+    padding: 1.2rem 0.6rem;
+  }
+  
+  .featureItem {
+    gap: 0.8rem;
+  }
+  
+  .featureIcon {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+  
+  .featureTitle {
+    font-size: 1rem;
+  }
+  
+  .featureDescription {
+    font-size: 0.9rem;
+  }
+  
+  .mobileMenu {
+    right: 10px;
+    top: 50px;
+    min-width: 130px;
+    padding: 10px;
+  }
+  
+  .mobileMenu button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
   }
 }
 

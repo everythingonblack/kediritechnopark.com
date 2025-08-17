@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
-import styles from './Styles.module.css';
+import styles from './ProductSection.module.css';
+import CoverflowCarousel from './CoverflowCarousel';
 import processProducts from '../helper/processProducts';
-
+import shared from './Styles.module.css';
+import useInView from '../hooks/useInView';
 
 const ProductSection = ({ setSelectedProduct, setShowedModal, productSectionRef, setWillDo }) => {
   const [products, setProducts] = useState([]);
-  const [hoveredCard, setHoveredCard] = useState(null);
-  // Define this function outside useEffect so it can be called anywhere
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
-
-  // Inside your component
   useEffect(() => {
     fetch('https://bot.kediritechnopark.com/webhook/store-production/products', {
       method: 'POST',
@@ -21,70 +21,79 @@ const ProductSection = ({ setSelectedProduct, setShowedModal, productSectionRef,
     })
       .then(res => res.json())
       .then(data => {
-        const enrichedData = processProducts(data);
-        setProducts(enrichedData);
+        const processed = processProducts(data);
+        setProducts(processed);
+        setFilteredProducts(processed);
       })
       .catch(err => console.error('Fetch error:', err));
   }, []);
 
-  return (
+  // Extract unique categories from products
+  const categories = ['all', ...new Set(products.map(product => product.category).filter(Boolean))];
 
-    <section id="services" className="services pt-5" ref={productSectionRef}>
+  // Filter products by category
+  useEffect(() => {
+    if (selectedCategory === 'all') {
+      setFilteredProducts(products);
+    } else {
+      setFilteredProducts(products.filter(product => product.category === selectedCategory));
+    }
+  }, [selectedCategory, products]);
+
+  // Handle product selection for detail view
+  const handleViewDetail = (product) => {
+    setSelectedProduct(product);
+    setShowedModal('product');
+    setWillDo('checkout');
+  };
+
+  const { ref, inView } = useInView();
+  return (
+    <section id="products" style={{scrollMarginTop: '65px' }} className={`${styles.productSection} ${shared.revealSection} ${inView ? shared.isVisible : ''}`} ref={(el) => {
+      if (typeof productSectionRef === 'function') productSectionRef(el);
+      if (ref) ref.current = el;
+    }}>
       <Container>
-        <div className="section-heading  mb-4">
-          <h4>OUR <em>PRODUCTS</em></h4>
-          <img src="/assets/images/heading-line-dec.png" alt="" />
-          <p>Kami menyediakan berbagai solusi teknologi untuk mendukung transformasi digital bisnis dan masyarakat.</p>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Produk Unggulan</h2>
+          <p>Produk digital siap pakai untuk mempercepat pertumbuhan bisnis Anda.</p>
         </div>
-        <div className={styles.coursesGrid}>
-          {products &&
-            products[0]?.name &&
-            products
-              .map(product => (
-                <div
-                  key={product.id}
-                  className={`${styles.courseCard} ${hoveredCard === product.id ? styles.courseCardHover : ''}`}
-                  onClick={() => {
-                    setSelectedProduct(product);
-                    setShowedModal('product');
-                  }}
-                  onMouseEnter={() => setHoveredCard(product.id)}
-                  onMouseLeave={() => setHoveredCard(null)}
+
+        {/* Category Filter */}
+        {categories.length > 2 && (
+          <div className={styles.filterContainer}>
+            <div className={styles.filterWrapper}>
+              <button 
+                className={`${styles.filterBtn} ${selectedCategory === 'all' ? styles.active : ''}`}
+                onClick={() => setSelectedCategory('all')}
+              >
+                Semua Produk
+              </button>
+              {categories.filter(cat => cat !== 'all').map(category => (
+                <button 
+                  key={category}
+                  className={`${styles.filterBtn} ${selectedCategory === category ? styles.active : ''}`}
+                  onClick={() => setSelectedCategory(category)}
                 >
-                  <div>
-                    <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }}>
-                      {product.price === 0 && (
-                        <span className={styles.courseLabel}>Free</span>
-                      )}
-                    </div>
-                    <div className={styles.courseContentTop}>
-                      <h3 className={styles.courseTitle}>{product.name}</h3>
-                      <p className={styles.courseDesc}>{product.description}</p>
-                    </div>
-                  </div>
-                  <div className={styles.courseContentBottom}>
-                    <div className={styles.coursePrice}>
-                      <span
-                        className={
-                          product.price === 0
-                            ? styles.freePrice
-                            : styles.currentPrice
-                        }
-                      >
-                        {product.price == null
-                          ? 'Pay-As-You-Go'
-                          : `Rp ${product.price.toLocaleString('id-ID')}`}
-                      </span>
-                    </div>
-                    <button className="px-4 py-2 rounded-pill text-white" style={{ fontSize: '0.8rem', background: 'linear-gradient(to right, #6a59ff, #8261ee)', border: 'none' }}
-                      onClick={() => {
-                        setSelectedProduct(product);
-                        setShowedModal('product');
-                        setWillDo('checkout');
-                      }}>Beli</button>
-                  </div>
-                </div>
+                  {category}
+                </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Coverflow Carousel */}
+        <div className={styles.carouselContainer}>
+          {filteredProducts.length > 0 ? (
+            <CoverflowCarousel 
+              products={filteredProducts} 
+              onCardClick={handleViewDetail} 
+            />
+          ) : (
+            <div className={styles.noProducts}>
+              <p>Tidak ada produk yang tersedia saat ini.</p>
+            </div>
+          )}
         </div>
       </Container>
     </section>
