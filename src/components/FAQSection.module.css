@@ -1,0 +1,214 @@
+.faqSection {
+  padding: 80px 20px;
+  background-color: #ffffff;
+}
+
+.sectionHeading {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 15px;
+  letter-spacing: -0.02em;
+}
+
+.highlight {
+  color: #0057b8;
+}
+
+.sectionDescription {
+  font-size: 1.1rem;
+  color: #64748b;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.accordionRoot {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.accordionItemShadcn {
+  border-radius: 0;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.accordionItemShadcn:last-child {
+  border-bottom: none;
+}
+
+.accordionItemShadcn:hover {
+  background-color: #f8fafc;
+}
+
+.accordionTriggerShadcn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.accordionTriggerShadcn:hover {
+  background-color: #f1f5f9;
+}
+
+.accordionTriggerShadcn:focus-visible {
+  outline: 2px solid #0057b8;
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.triggerText {
+  flex: 1;
+  margin-right: 16px;
+  line-height: 1.4;
+}
+
+.chevron {
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevron.rotated {
+  transform: rotate(180deg);
+}
+
+.accordionContentShadcn {
+  overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+  background-color: white;
+}
+
+.accordionContentShadcn.expanded {
+  border-top: 1px solid #e2e8f0;
+}
+
+.contentInner {
+  padding: 0 20px 20px;
+}
+
+.answer {
+  color: #64748b;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .faqSection {
+    padding: 70px 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .faqSection {
+    padding: 60px 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 2rem;
+  }
+  
+  .sectionDescription {
+    font-size: 1rem;
+  }
+  
+  .accordionTriggerShadcn {
+    padding: 16px 18px;
+    font-size: 0.95rem;
+  }
+  
+  .contentInner {
+    padding: 0 18px 18px;
+  }
+  
+  .answer {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .faqSection {
+    padding: 50px 15px;
+  }
+  
+  .sectionHeading {
+    margin-bottom: 40px;
+  }
+  
+  .sectionTitle {
+    font-size: 1.8rem;
+  }
+  
+  .accordionTriggerShadcn {
+    padding: 15px 16px;
+  }
+  
+  .contentInner {
+    padding: 0 16px 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .faqSection {
+    padding: 40px 15px;
+  }
+  
+  .sectionTitle {
+    font-size: 1.6rem;
+  }
+  
+  .sectionDescription {
+    font-size: 0.95rem;
+  }
+  
+  .accordionTriggerShadcn {
+    padding: 14px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .contentInner {
+    padding: 0 15px 15px;
+  }
+  
+  .answer {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .faqSection {
+    padding: 35px 10px;
+  }
+  
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+  
+  .accordionTriggerShadcn {
+    padding: 12px 14px;
+  }
+}

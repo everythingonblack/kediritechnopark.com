@@ -1,38 +1,35 @@
 import React from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
+import styles from './AboutUsSection.module.css';
+import { CheckCircle } from 'lucide-react';
+import AnimatedBackground from './AnimatedBackground'; // Impor komponen baru
+import shared from './Styles.module.css';
+import useInView from '../hooks/useInView';
 
 const AboutUsSection = () => {
+  const { ref, inView } = useInView();
   return (
-    <section id="about" className="about-us section pt-5">
-      <Container>
-        <Row className="align-items-center">
-          <Col lg={6}>
-            <div className="section-heading">
-              <span style={{ color: '#6a59ff', fontWeight: 'bold' }}>Kediri Technopark</span>
-              <h2 className="mt-2">ABOUT US</h2>
-              <img src="/assets/images/heading-line-dec.png" alt="" />
-              <p className="mt-3">
-                <strong>Kediri Technopark: Katalis Inovasi dan Pusat Pertumbuhan Digital Lokal</strong><br /><br />
-                Kediri Technopark adalah inisiatif strategis yang bertujuan membangun ekosistem teknologi dan inovasi yang dinamis di Kediri, Jawa Timur. Kami menyediakan infrastruktur, sumber daya, dan komunitas pendukung yang dibutuhkan untuk mendorong pertumbuhan startup dan bisnis IT yang sudah ada.<br /><br />
-                Dengan misi memberdayakan talenta lokal, menjembatani teknologi dan industri, serta mempercepat transformasi digital, Kediri Technopark berkomitmen menjadi penggerak kemajuan ekonomi dan teknologi, baik di tingkat lokal maupun nasional.
-              </p>
-              <div className="mt-4 d-flex gap-3">
-                <Button href="https://instagram.com/kediri.technopark" className="px-4 py-2 rounded-pill text-white" style={{ background: 'linear-gradient(to right, #6a59ff, #8261ee)', border: 'none' }}>
-                  Instagram
-                </Button>
-                <Button href="https://wa.me/6281318894994" target="_blank" variant="outline-success" className="px-4 py-2 rounded-pill">
-                  <i className="fab fa-whatsapp"></i> WhatsApp
-                </Button>
+    <section id="about" ref={ref} className={`${styles.aboutSection} ${shared.revealSection} ${inView ? shared.isVisible : ''}`}>
+      <AnimatedBackground /> {/* Komponen animasi sebagai latar belakang */}
+      <div className={styles.contentWrapper}>
+        <Container>
+          <Row className="justify-content-center">
+            <Col lg={8}>
+              <div className={styles.textContent}>
+                <h2 className={styles.sectionTitle}>Tentang Kami</h2>
+                <p className={styles.paragraph}>
+                  Kediri Technopark adalah ekosistem inovasi yang didedikasikan untuk mendorong pertumbuhan talenta digital dan akselerasi bisnis teknologi. Kami menyediakan fasilitas, program, dan jaringan yang dibutuhkan untuk mengubah ide brilian menjadi solusi nyata yang berdampak.
+                </p>
+                <ul className={styles.valueList}>
+                  <li><CheckCircle size={20} className={styles.listIcon} /><span>Inovasi Berkelanjutan</span></li>
+                  <li><CheckCircle size={20} className={styles.listIcon} /><span>Kolaborasi Komunitas</span></li>
+                  <li><CheckCircle size={20} className={styles.listIcon} /><span>Pemberdayaan Talenta</span></li>
+                </ul>
               </div>
-            </div>
-          </Col>
-          <Col lg={6}>
-            <div className="right-image">
-              <img src="/assets/images/about-right-dec.png" alt="" className="img-fluid" />
-            </div>
-          </Col>
-        </Row>
-      </Container>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     </section>
   );
 };

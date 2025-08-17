@@ -1,3 +1,27 @@
+:root {
+  --brand: #0057b8ff; /* primary brand color */
+  --brand-600: #004a9e; /* hover */
+  --brand-700: #003e85; /* active */
+  /* Hero and surface tokens */
+  --surface: #ffffff;
+  --text: #0f172a; /* slate-900 */
+  --muted: #475569; /* slate-600 */
+  --radius-2xl: 20px;
+  --shadow-soft: 0 20px 50px rgba(15, 23, 42, 0.08);
+  --header-h: 84px; /* approximate header height for hero sizing */
+  /* Neutral shadows for CTAs */
+  --shadow-neutral-s: 0 6px 16px rgba(17, 24, 39, 0.08);
+  --shadow-neutral-m: 0 8px 22px rgba(17, 24, 39, 0.12);
+}
+
+@media (max-width: 800px) {
+  :root { --header-h: 76px; }
+}
+
+@media (max-width: 600px) {
+  :root { --header-h: 70px; }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

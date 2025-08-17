@@ -9,8 +9,11 @@ import ServicesSection from './components/ServicesSection';
 import ProductSection from './components/ProductSection';
 import AcademySection from './components/AcademySection';
 import AboutUsSection from './components/AboutUsSection';
-import KnowledgeBaseSection from './components/KnowledgeBaseSection';
-import ClientsSection from './components/ClientsSection';
+// KnowledgeBaseSection hidden temporarily
+// import KnowledgeBaseSection from './components/KnowledgeBaseSection';
+// ClientsSection hidden temporarily
+// import ClientsSection from './components/ClientsSection';
+import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
 import ProductDetailPage from './components/ProductDetailPage';
 import Dashboard from './components/Dashboard';
@@ -44,8 +47,9 @@ function HomePage({
         setShowedModal={setShowedModal}
         setWillDo={setWillDo}
       />
-      <KnowledgeBaseSection />
-      <ClientsSection />
+      {/* <KnowledgeBaseSection /> */}
+      {/* <ClientsSection /> */}
+      <FAQSection />
     </>
   );
 }
