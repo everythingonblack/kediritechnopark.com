@@ -23,34 +23,14 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
       requestLogin('checkout');
       return;
     }
-    if (product.type == 'product') {
+
+    if (product.type === 'product') {
       const hasMatchingSubscription = Array.isArray(subscriptions) &&
         subscriptions.some(sub =>
           String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
         );
 
-      // Always show children selector first if product has children
-      if (product.children && product.children.length > 0) {
-        setShowChildSelector(true);
-
-        if (hasMatchingSubscription) {
-          const matching = subscriptions.filter(sub =>
-            String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
-          );
-
-          if (matching.length > 0) {
-            // ✅ Select only the first for each product_name
-            const uniqueByName = Array.from(
-              new Map(matching.map(sub => [sub.product_name, sub])).values()
-            );
-
-            setMatchingSubscriptions(uniqueByName);
-          }
-        }
-        return;
-      }
-
-      // No children, but has subscription match
+      // ✅ Check subscription first
       if (hasMatchingSubscription) {
         const matching = subscriptions.filter(sub =>
           String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
@@ -64,55 +44,59 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
           setMatchingSubscriptions(uniqueByName);
           setShowSubscriptionSelector(true);
           return;
-        }
-        else {
+        } else {
           const itemsParam = JSON.stringify([product.id]);
           window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&set_name=${product.name}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
           return;
         }
       }
 
+      // ✅ If no subscription → ask for new product name
       setShowNamingInput(true);
       return;
-
     }
-    // No children, no matching subscription
+
+    // Fallback: direct checkout
     const itemsParam = JSON.stringify([product.id]);
     window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
   };
 
+  // ✅ Confirm child selection (final step after naming)
   const onConfirmChildren = () => {
-    if (matchingSubscriptions.length > 0 && !product.executeCheckout) {
-      setShowChildSelector(false);
-      setShowSubscriptionSelector(true);
+    if (selectedChildIds.length === 0) {
+      alert('Pilih minimal satu produk');
       return;
-    }
-    else if (!product.executeCheckout){
-      setShowChildSelector(false);
-      setShowNamingInput(true);
     }
 
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
 
-    if (selectedChildIds.length === 0) {
-      alert('Pilih minimal satu produk');
-      return;
-    }
-    const encodedName = encodeURIComponent(product.executeCheckout);
-    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) : JSON.stringify([product.id]);
-    window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&set_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
+    const encodedName = encodeURIComponent(customName.trim() || product.name);
+    const itemsParam = JSON.stringify(selectedChildIds);
+
+    window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&new_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
   };
 
+  // ✅ User sets name first → then if product has children, show child selector
   const onFinalCheckoutNewProduct = () => {
     if (!customName.trim()) {
       alert('Nama produk tidak boleh kosong');
       return;
     }
 
+    if (product.children && product.children.length > 0) {
+      // don’t redirect yet → go to child selector
+                setShowSubscriptionSelector(false);
+
+      setShowNamingInput(false);
+      setShowChildSelector(true);
+      return;
+    }
+
+    // if no children → go straight to checkout
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
-    const itemsParam = selectedChildIds.length > 0 ? JSON.stringify(selectedChildIds) : JSON.stringify([product.id]);
+    const itemsParam = JSON.stringify([product.id]);
     const encodedName = encodeURIComponent(customName.trim());
 
     window.location.href = `https://checkout.kediritechnopark.com/?token=${token}&itemsId=${itemsParam}&new_name=${encodedName}&redirect_uri=https://kediritechnopark.com/products&redirect_failed=https://kediritechnopark.com`;
@@ -145,13 +129,14 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
     if (willDo === 'checkout') {
       onCheckout();
     }
-    if(setWillDo) setWillDo(''); // Reset willDo after handling
+    if (setWillDo) setWillDo('');
   }, []);
 
   const priceColor = product.price === 0 ? '#059669' : '#2563eb';
-  console.log(product)
+
   return (
     <div className={styles.container}>
+      {/* Default view */}
       {!showChildSelector && !showSubscriptionSelector && !showNamingInput && (
         <>
           <div className={styles.image} style={{ backgroundImage: `url(${product.image})` }}></div>
@@ -184,11 +169,11 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
                   sub.product_id === product.id || sub.product_parent_id === product.id
                 ) && product.end_date ? 'Perpanjang' : 'Checkout'}
             </button>
-
           </div>
         </>
       )}
 
+      {/* Child selector */}
       {showChildSelector && (
         <div className={styles.childSelector}>
           <h3>Pilih Paket</h3>
@@ -198,25 +183,16 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
                 type="radio"
                 value={child.id}
                 checked={selectedChildIds.includes(child.id)}
-                onChange={e => {
-                  const checked = e.target.checked;
-                  setSelectedChildIds(prev =>
-                    checked ? [...prev, child.id] : prev.filter(id => id !== child.id)
-                  );
-                }}
+                onChange={() => setSelectedChildIds([child.id])}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-              &nbsp;{child.name} 
+                <div>&nbsp;{child.name}</div>
+                <div>Rp {parseInt(child.price || 0).toLocaleString('id-ID')}</div>
               </div>
-              <div>
-              Rp {parseInt(child.price || 0).toLocaleString('id-ID')}
-                </div>
-                </div>
             </label>
           ))}
           <div className={styles.buttonGroup}>
-            <button className={styles.button} onClick={() => setShowChildSelector(false)}>
+            <button className={styles.button} onClick={() => { setShowChildSelector(false); setShowNamingInput(true); }}>
               Kembali
             </button>
             <button className={styles.button} onClick={onConfirmChildren}>
@@ -226,17 +202,18 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
         </div>
       )}
 
+      {/* Subscription selector */}
       {showSubscriptionSelector && !showNamingInput && (
         <div className={styles.childSelector}>
           <h5>Kamu sudah punya produk ini</h5>
-          <div className={styles.childProduct} onClick={()=>{setShowedModal('');navigate('/dashboard')}}>
+          <div className={styles.childProduct} onClick={() => { setShowedModal(''); navigate('/dashboard') }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <div>Perpanjang produk ini</div>
               <div>➔</div>
             </div>
           </div>
           <h6>Atau</h6>
-          <label className={styles.childProduct} onClick={()=>{setSelectedSubscriptionId(0); onConfirmSelector();}}>
+          <label className={styles.childProduct} onClick={() => { setSelectedSubscriptionId(0); onConfirmSelector(); }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <div>Tambah {product.name.split('%%%')[0]} baru</div>
               <div>➔</div>
@@ -250,6 +227,7 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
         </div>
       )}
 
+      {/* Naming input */}
       {showNamingInput && (
         <div className={styles.childSelector}>
           <h5>Buat {product.name.split('%%%')[0]} Baru</h5>
@@ -262,47 +240,20 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
             style={{ width: '100%', padding: '8px', marginBottom: '16px', borderRadius: '10px' }}
           />
 
-          {
-            matchingSubscriptions.some(
-              (sub) => sub.product_name === `${product.name}@${customName}`
-            ) && (
-              <p style={{ color: 'red', marginBottom: '10px' }}>
-                Nama produk sudah digunakan.
-              </p>
-            )
-          }
-
           <div className={styles.buttonGroup}>
-            <button
-              className={styles.button}
-              onClick={() => {
-                setShowNamingInput(false);
-
-                const hasMatchingSubscription = Array.isArray(subscriptions) &&
-                  subscriptions.some(sub =>
-                    String(sub.product_id) === String(product.id) || String(sub.product_parent_id) === String(product.id)
-                  );
-                if (hasMatchingSubscription) setShowSubscriptionSelector(true);
-              }}
-            >
+            <button className={styles.button} onClick={() => setShowNamingInput(false)}>
               Kembali
             </button>
             <button
               className={styles.button}
               onClick={onFinalCheckoutNewProduct}
-              disabled={
-                customName.trim() === '' ||
-                matchingSubscriptions.some(
-                  (sub) => sub.product_name === `${product.name}@${customName}`
-                )
-              }
+              disabled={customName.trim() === ''}
             >
-              Checkout
+              Lanjut
             </button>
           </div>
         </div>
       )}
-
     </div>
   );
 };

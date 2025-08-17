@@ -105,6 +105,10 @@ const LoginRegister = ({setShowedModal}) => {
           window.history.replaceState({}, '', newUrl);
           setShowedModal('product');
         } else {
+
+          const params = new URLSearchParams(window.location.search);
+          const modalType = params.get('modal');
+          if(!modalType)
           navigate('/dashboard');
           window.location.reload();
         }

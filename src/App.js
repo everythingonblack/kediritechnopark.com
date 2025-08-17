@@ -10,9 +10,9 @@ import ProductSection from './components/ProductSection';
 import AcademySection from './components/AcademySection';
 import AboutUsSection from './components/AboutUsSection';
 // KnowledgeBaseSection hidden temporarily
-// import KnowledgeBaseSection from './components/KnowledgeBaseSection';
+import KnowledgeBaseSection from './components/KnowledgeBaseSection';
 // ClientsSection hidden temporarily
-// import ClientsSection from './components/ClientsSection';
+import ClientsSection from './components/ClientsSection';
 import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
 import ProductDetailPage from './components/ProductDetailPage';
@@ -36,8 +36,8 @@ function HomePage({
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
 
-    if(tab === 'products') scrollToProduct();
-    if(tab === 'academy') scrollToCourse();
+    if (tab === 'products') scrollToProduct();
+    if (tab === 'academy') scrollToCourse();
   }, [productSectionRef, courseSectionRef]);
 
   return (
@@ -165,8 +165,8 @@ function App() {
       // Jika sudah login, tidak langsung fetch di sini — akan diproses saat subscriptions tersedia
     }
 
-    if(tab === 'products') scrollToProduct();
-    if(tab === 'academy') scrollToCourse();
+    if (tab === 'products') scrollToProduct();
+    if (tab === 'academy') scrollToCourse();
   }, []);
 
   useEffect(() => {
@@ -323,9 +323,9 @@ function App() {
               />
             }
           />
-          <Route path="/dashboard" element={<ProductsPage 
-                setShowedModal={setShowedModal}
- setSelectedProduct={setSelectedProduct} subscriptions={subscriptions} setWillDo={setWillDo} />} />
+          <Route path="/dashboard" element={<ProductsPage
+            setShowedModal={setShowedModal}
+            setSelectedProduct={setSelectedProduct} subscriptions={subscriptions} setWillDo={setWillDo} />} />
           <Route
             path="/admin"
             element={
