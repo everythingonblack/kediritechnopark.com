@@ -86,7 +86,7 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
 
     if (product.children && product.children.length > 0) {
       // don’t redirect yet → go to child selector
-                setShowSubscriptionSelector(false);
+        setShowSubscriptionSelector(false);
 
       setShowNamingInput(false);
       setShowChildSelector(true);

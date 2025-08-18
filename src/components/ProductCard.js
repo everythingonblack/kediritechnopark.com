@@ -33,7 +33,7 @@ const ProductCard = ({ product, onCardClick, isCenter, canHover, onCollapse }) =
             <div className={styles.buttonGroup}>
               <button
                 className={styles.detailButton}
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCardClick && onCardClick(product); }}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCardClick && onCardClick(product, true); }}
               >
                 Detail
               </button>

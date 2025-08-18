@@ -182,7 +182,7 @@ const CoverflowCarousel = ({ products, onCardClick }) => {
               <div className={styles.cardWrapper}>
                 <ProductCard 
                   product={product} 
-                  onCardClick={(p) => { onCardClick && onCardClick(p); }}
+                  onCardClick={(p,d) => { onCardClick && onCardClick(p,d); }}
                   isCenter={position === 0}
                   canHover={position === 0 && animationState === 'ready' && !shiftDirection && !isDragging}
                   onCollapse={position === 0 ? collapseOverlay : undefined}

@@ -41,7 +41,12 @@ const ProductSection = ({ setSelectedProduct, setShowedModal, productSectionRef,
   }, [selectedCategory, products]);
 
   // Handle product selection for detail view
-  const handleViewDetail = (product) => {
+  const handleViewDetail = (product, detailed) => {
+    if(detailed) {
+      setSelectedProduct(product);
+      setShowedModal('product');
+      return;
+    }
     setSelectedProduct(product);
     setShowedModal('product');
     setWillDo('checkout');
