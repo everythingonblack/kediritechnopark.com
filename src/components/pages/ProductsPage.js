@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import styles from "../Styles.module.css";
-import { Box, Settings, ShoppingCart } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
-
+import { Container, Row, Col, Card, Button, Tabs, Tab, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = ({
   subscriptions,
@@ -13,10 +11,9 @@ const Dashboard = ({
 }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("products");
-  const [hoveredCard, setHoveredCard] = useState(null);
   const [products, setProducts] = useState([]);
+  const [hoveredCard, setHoveredCard] = useState(null);
 
-  // User Settings form state
   const [settings, setSettings] = useState({
     username: "",
     email: "",
@@ -30,76 +27,83 @@ const Dashboard = ({
     }
   });
 
-  useEffect(() => {
-    if (userData) {
-      setSettings(userData);
+  // 🔹 Handle input settings
+  const handleSettingsChange = (field, value, nested = false) => {
+    if (nested) {
+      setSettings((prev) => ({
+        ...prev,
+        profile_data: { ...prev.profile_data, [field]: value }
+      }));
+    } else {
+      setSettings((prev) => ({ ...prev, [field]: value }));
     }
-  }, [userData]);
+  };
 
+  // 🔹 Save profile
+  const saveSettings = () => {
+    fetch("https://bot.kediritechnopark.com/webhook-test/user-production/data", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(settings)
+    })
+      .then((res) => res.json())
+      .then(() => alert("Settings updated successfully!"))
+      .catch((err) => alert("Error updating settings: " + err));
+  };
+
+  // 🔹 Group subscriptions
+  const groupSubscriptionsByProductName = (subs) => {
+    const result = {};
+    subs.forEach((sub) => {
+      const name = sub.product_name;
+      const productId = sub.product_id;
+      if (!result[name]) {
+        result[name] = {
+          product_id: productId,
+          product_name: name,
+          unit_type: sub.unit_type,
+          end_date: sub.end_date,
+          quantity: 0,
+          subscriptions: []
+        };
+      }
+      const currentEnd = new Date(result[name].end_date);
+      const thisEnd = new Date(sub.end_date);
+      if (thisEnd > currentEnd) result[name].end_date = sub.end_date;
+
+      if (sub.unit_type === "token") {
+        result[name].quantity += sub.quantity ?? 0;
+      } else {
+        result[name].quantity += 1;
+      }
+      result[name].subscriptions.push(sub);
+    });
+    return result;
+  };
+
+  // 🔹 Fetch produk berdasarkan subscription
   useEffect(() => {
     if (!subscriptions) return;
-
-    function groupSubscriptionsByProductName(subs) {
-      const result = {};
-      subs.forEach((sub) => {
-        const name = sub.product_name;
-        const productId = sub.product_id;
-        if (!result[name]) {
-          result[name] = {
-            product_id: productId,
-            product_name: name,
-            unit_type: sub.unit_type,
-            end_date: sub.end_date,
-            quantity: 0,
-            subscriptions: []
-          };
-        }
-
-        const currentEnd = new Date(result[name].end_date);
-        const thisEnd = new Date(sub.end_date);
-        if (thisEnd > currentEnd) {
-          result[name].end_date = sub.end_date;
-        }
-
-        if (sub.unit_type === "token") {
-          result[name].quantity += sub.quantity ?? 0;
-        } else {
-          result[name].quantity += 1;
-        }
-
-        result[name].subscriptions.push(sub);
-      });
-
-      return result;
-    }
 
     const groupedSubs = groupSubscriptionsByProductName(subscriptions);
     const productIds = [...new Set(subscriptions.map((s) => s.product_id))];
 
-    fetch(
-      "https://bot.kediritechnopark.com/webhook/store-production/products",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ itemsId: productIds})
-      }
-    )
+    fetch("https://bot.kediritechnopark.com/webhook/store-production/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itemsId: productIds })
+    })
       .then((res) => res.json())
       .then((data) => {
-        // Step 1: Enrich base products (without children yet)
         const enrichedData = Object.values(groupedSubs)
           .filter((group) => data.some((p) => p.id === group.product_id))
           .map((group) => {
-            const productData = data.find((p) => p.id == group.product_id);
+            const productData = data.find((p) => p.id === group.product_id);
             let image = productData?.image || "";
             let description = productData?.description || "";
             let site_url = productData?.site_url || "";
             if (!image && productData?.sub_product_of) {
-              const parent = data.find(
-                (p) => p.id === productData.sub_product_of
-              );
+              const parent = data.find((p) => p.id === productData.sub_product_of);
               image = parent?.image || "";
               description = parent?.description || "";
               site_url = parent?.site_url || "";
@@ -124,301 +128,203 @@ const Dashboard = ({
             };
           });
 
-        // Step 2: Create a quick lookup table for enrichedData
-        const productMap = {};
-        enrichedData.forEach((p) => {
-          console.log(p)
-          productMap[p.name.split("%%%")[1]] = p;
-        });
-
-        // Step 3: Find children in API `data` and attach to parents
-        data
-          .filter((p) => p.sub_product_of) // only those with a parent
-          .forEach((child) => {
-            // ✅ Current logic — attach to the real parent
-            const parent = productMap[child.sub_product_of];
-            if (parent) {
-              parent.children.push(child);
-            }
-            // ➕ New logic — attach to other products with the same sub_product_of
-            Object.values(productMap).forEach((possibleParent) => {
-              if (
-                possibleParent.id !== child.id && // not itself
-                possibleParent.sub_product_of === child.sub_product_of // same parent reference
-              ) {
-                possibleParent.children.push(child);
-              }
-            });
-          });
-        console.log(enrichedData)
         setProducts(enrichedData);
       })
       .catch((err) => console.error("Fetch error:", err));
-
   }, [subscriptions]);
 
-  const handleSettingsChange = (field, value, nested = false) => {
-    if (nested) {
-      setSettings((prev) => ({
-        ...prev,
-        profile_data: { ...prev.profile_data, [field]: value }
-      }));
-    } else {
-      setSettings((prev) => ({ ...prev, [field]: value }));
-    }
-  };
-
-  const saveSettings = () => {
-    fetch(
-      "https://bot.kediritechnopark.com/webhook-test/user-production/data",
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(settings)
-      }
-    )
-      .then((res) => res.json())
-      .then(() => {
-        alert("Settings updated successfully!");
-      })
-      .catch((err) => alert("Error updating settings: " + err));
-  };
-
   return (
-    <div style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
-      {/* Tabs Navigation */}
-      <div className={styles.navTabs}>
-        <button
-          className={`${styles.floatMenuItem} ${activeTab === "products" ? styles.floatMenuItemActive : ""
-            }`}
-          onClick={() => setActiveTab("products")}
-        >
-          <span className={styles.floatMenuTitle}>Produk Saya</span>
-          <Box size={16} className={styles.floatMenuIcon} />
-        </button>
-
-        <button
-          className={`${styles.floatMenuItem} ${activeTab === "settings" ? styles.floatMenuItemActive : ""
-            }`}
-          onClick={() => setActiveTab("settings")}
-        >
-          <span className={styles.floatMenuTitle}>Profil Pengguna</span>
-          <Settings size={16} className={styles.floatMenuIcon} />
-        </button>
-
-        <button
-          className={`${styles.floatMenuItem} ${activeTab === "orders" ? styles.floatMenuItemActive : ""
-            }`}
-          onClick={() => setActiveTab("orders")}
-        >
-          <span className={styles.floatMenuTitle}>Pembelian</span>
-          <ShoppingCart size={16} className={styles.floatMenuIcon} />
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === "products" && (
-        <section className={styles.Section}>
-          <div className={styles.coursesContainer}>
-            <div className={styles.coursesGrid}>
-              {products.map((product) => (
-                <div
-                  key={product.name}
-                  className={`${styles.courseCard} ${hoveredCard === product.name ? styles.courseCardHover : ""
-                    }`}
+    <Container fluid className="mt-4">
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(k) => setActiveTab(k)}
+        className="mb-3"
+      >
+        {/* Produk Saya */}
+        <Tab eventKey="products" title="Produk Saya">
+          <Row>
+            {products.map((product) => (
+              <Col md={4} key={product.id} className="mb-4">
+                <Card
+                  className={`h-100 shadow-sm ${hoveredCard === product.name ? "border-primary" : ""}`}
+                  onMouseEnter={() => setHoveredCard(product.name)}
+                  onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => {
                     setSelectedProduct(product);
                     setShowedModal("product");
                   }}
-                  onMouseEnter={() => setHoveredCard(product.name)}
-                  onMouseLeave={() => setHoveredCard(null)}
                 >
-                  <div>
-                    <div
-                      className={styles.courseImage}
-                      style={{
-                        backgroundImage: `url(${product.image})`
-                      }}
-                    />
-                    <div className={styles.courseContentTop}>
-                      <h3 className={styles.courseTitle}>
-                        {product.name.split("%%%")[0]}
-                      </h3>
-                      <p className={styles.courseDesc}>
-                        {product.description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className={styles.courseContentBottom}>
-                    <div className={styles.coursePrice}>
-                      <span
-                        className={
-                          product.price === 0
-                            ? styles.freePrice
-                            : styles.currentPrice
-                        }
-                      >
-                        {product.unit_type === "duration"
-                          ? `Valid until: ${product.end_date
-                            ? new Date(
-                              product.end_date
-                            ).toLocaleDateString()
-                            : "N/A"
+                  {product.image && (
+                    <Card.Img variant="top" src={product.image} />
+                  )}
+                  <Card.Body>
+                    <Card.Title>{product.name.split("%%%")[0]}</Card.Title>
+                    <Card.Text>{product.description}</Card.Text>
+                  </Card.Body>
+                  <Card.Footer>
+                    <small className="text-muted">
+                      {product.unit_type === "duration"
+                        ? `Valid until: ${
+                            product.end_date
+                              ? new Date(product.end_date).toLocaleDateString()
+                              : "N/A"
                           }`
-                          : `SISA TOKEN ${product.quantity || 0}`}
-                      </span>
-                    </div>
-
-                    <button
-                      className="px-4 py-2 rounded-pill text-white"
-                      style={{
-                        background:
-                          "linear-gradient(to right, #6a59ff, #8261ee)",
-                        border: "none"
-                      }}
+                        : `SISA TOKEN ${product.quantity || 0}`}
+                    </small>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="float-end"
                       onClick={() => {
                         setSelectedProduct(product);
                         setShowedModal("product");
-                        setWillDo('checkout');
+                        setWillDo("checkout");
                       }}
                     >
                       Perpanjang
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <div
-                className={`${styles.courseCard} ${hoveredCard === 0 ? styles.courseCardHover : ""
-                  }`}
-                onMouseEnter={() => setHoveredCard(0)}
-                onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => navigate('/?tab=products')
-                }
+                    </Button>
+                  </Card.Footer>
+                </Card>
+              </Col>
+            ))}
+
+            {/* Tambah produk baru */}
+            <Col md={4} className="mb-4">
+              <Card
+                className={`h-100 shadow-sm text-center align-items-center justify-content-center`}
+                onClick={() => navigate("/?tab=products")}
               >
-                <div>
-                  + Tambah produk baru</div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+                <Card.Body>
+                  <h5>+ Tambah produk baru</h5>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Tab>
 
-      {activeTab === "settings" && (
-        <section className={styles.profileSection}>
-          <h2 className={styles.profileHeading}>Profil</h2>
-          <div className={styles.sectionDivider}></div>
+        {/* Profil Pengguna */}
+        <Tab eventKey="settings" title="Profil Pengguna">
+          <Form>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Username</Form.Label>
+                  <Form.Control
+                    value={settings.username}
+                    onChange={(e) =>
+                      handleSettingsChange("username", e.target.value)
+                    }
+                  />
+                </Form.Group>
+              </Col>
 
-          <div className={styles.formGrid}>
-            <div>
-              <label className={styles.label}>Username</label>
-              <input
-                className={styles.inputField}
-                value={settings.username}
-                onChange={(e) =>
-                  handleSettingsChange("username", e.target.value)
-                }
-              />
-            </div>
-            <div>
-              <label className={styles.label}>Email</label>
-              <input
-                className={styles.inputField}
-                value={settings.email}
-                onChange={(e) =>
-                  handleSettingsChange("email", e.target.value)
-                }
-              />
-            </div>
-            <div>
-              <label className={styles.label}>Full Name</label>
-              <input
-                className={styles.inputField}
-                value={settings.profile_data.name}
-                onChange={(e) =>
-                  handleSettingsChange("name", e.target.value, true)
-                }
-              />
-            </div>
-            <div>
-              <label className={styles.label}>Phone</label>
-              <input
-                className={styles.inputField}
-                value={settings.profile_data.phone}
-                onChange={(e) =>
-                  handleSettingsChange("phone", e.target.value, true)
-                }
-              />
-            </div>
-            <div className={styles.fullWidth}>
-              <label className={styles.label}>Address</label>
-              <input
-                className={styles.inputField}
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    value={settings.email}
+                    onChange={(e) =>
+                      handleSettingsChange("email", e.target.value)
+                    }
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Full Name</Form.Label>
+                  <Form.Control
+                    value={settings.profile_data.name}
+                    onChange={(e) =>
+                      handleSettingsChange("name", e.target.value, true)
+                    }
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Phone</Form.Label>
+                  <Form.Control
+                    value={settings.profile_data.phone}
+                    onChange={(e) =>
+                      handleSettingsChange("phone", e.target.value, true)
+                    }
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Address</Form.Label>
+              <Form.Control
                 value={settings.profile_data.address}
                 onChange={(e) =>
                   handleSettingsChange("address", e.target.value, true)
                 }
               />
-            </div>
-            <div>
-              <label className={styles.label}>Company</label>
-              <input
-                className={styles.inputField}
-                value={settings.profile_data.company}
-                onChange={(e) =>
-                  handleSettingsChange("company", e.target.value, true)
-                }
-              />
-            </div>
-            <div>
-              <label className={styles.label}>Profile Image URL</label>
-              <input
-                className={styles.inputField}
-                value={settings.profile_data.image}
-                onChange={(e) =>
-                  handleSettingsChange("image", e.target.value, true)
-                }
-              />
-            </div>
-          </div>
+            </Form.Group>
 
-          <h2 className={styles.profileHeading}>Ganti password</h2>
-          <div className={styles.sectionDivider}></div>
-          <div className={styles.formGrid}>
-            <div>
-              <label className={styles.label}>New Password</label>
-              <input
-                className={styles.inputField}
-                type="password"
-                value={settings.password}
-                onChange={(e) =>
-                  handleSettingsChange("password", e.target.value)
-                }
-              />
-            </div>
-            <div>
-              <label className={styles.label}>Re-type New Password</label>
-              <input
-                className={styles.inputField}
-                type="password"
-              />
-            </div>
-          </div>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Company</Form.Label>
+                  <Form.Control
+                    value={settings.profile_data.company}
+                    onChange={(e) =>
+                      handleSettingsChange("company", e.target.value, true)
+                    }
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Profile Image URL</Form.Label>
+                  <Form.Control
+                    value={settings.profile_data.image}
+                    onChange={(e) =>
+                      handleSettingsChange("image", e.target.value, true)
+                    }
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
 
-          <button className={styles.saveButton} onClick={saveSettings}>
-            Save Changes
-          </button>
-        </section>
-      )}
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>New Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    value={settings.password}
+                    onChange={(e) =>
+                      handleSettingsChange("password", e.target.value)
+                    }
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Re-type New Password</Form.Label>
+                  <Form.Control type="password" />
+                </Form.Group>
+              </Col>
+            </Row>
 
-      {activeTab === "orders" && (
-        <section className={styles.Section}>
-          <h2>My Orders</h2>
+            <Button variant="success" onClick={saveSettings}>
+              Save Changes
+            </Button>
+          </Form>
+        </Tab>
+
+        {/* Orders */}
+        <Tab eventKey="orders" title="Pembelian">
+          <h4>My Orders</h4>
           <p>Orders list will be displayed here.</p>
-        </section>
-      )}
-    </div>
+        </Tab>
+      </Tabs>
+    </Container>
   );
 };
 
