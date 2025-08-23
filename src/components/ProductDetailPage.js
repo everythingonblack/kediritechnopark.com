@@ -11,9 +11,59 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
   const [showSubscriptionSelector, setShowSubscriptionSelector] = useState(false);
 
   const [showNamingInput, setShowNamingInput] = useState(false);
-  const [customName, setCustomName] = useState('');
 
   const navigate = useNavigate();
+
+  const [customName, setCustomName] = useState('');
+  const [status, setStatus] = useState('idle'); // 'idle' | 'checking' | 'available' | 'unavailable' | 'error'
+
+
+  const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+  const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+
+
+  // Helper panggil API kamu (GET + token header)
+  async function checkProductAvailability(name, token) {
+    const url = `https://bot.kediritechnopark.com/webhook/store_production/check_p_availability?productId=${product.id}&name=${encodeURIComponent(name)}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+    });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    const data = await res.json(); // expected: { allowed: true|false }
+    return Boolean(data.allowed);
+  }
+  // Auto check saat user mengetik (debounce)
+  useEffect(() => {
+    if (product.unique_name == false) return;
+
+    const name = customName.trim();
+    if (!name) {
+      setStatus('idle');
+      return;
+    }
+    let cancelled = false;
+    setStatus('checking');
+
+    const t = setTimeout(async () => {
+      try {
+        const allowed = await checkProductAvailability(name, token);
+        if (cancelled) return;
+        setStatus(allowed ? 'available' : 'unavailable');
+      } catch (e) {
+        if (cancelled) return;
+        setStatus('error');
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [customName, token]);
 
   const onCheckout = () => {
     const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
@@ -86,7 +136,7 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
 
     if (product.children && product.children.length > 0) {
       // don’t redirect yet → go to child selector
-        setShowSubscriptionSelector(false);
+      setShowSubscriptionSelector(false);
 
       setShowNamingInput(false);
       setShowChildSelector(true);
@@ -133,6 +183,30 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
   }, []);
 
   const priceColor = product.price === 0 ? '#059669' : '#2563eb';
+
+  // Komponen kecil untuk menampilkan status teks
+  const StatusLine = () => {
+    if (status === 'idle') return null;
+    const map = {
+      checking: 'Memeriksa…',
+      available: 'Nama tersedia',
+      unavailable: 'Nama tidak tersedia',
+      error: 'Gagal memeriksa. Coba lagi.',
+    };
+    const color =
+      status === 'available'
+        ? '#16a34a'
+        : status === 'unavailable'
+          ? '#dc2626'
+          : status === 'checking'
+            ? '#2563eb'
+            : '#6b7280';
+    return (
+      <div style={{ marginTop: 6, fontSize: 12, color }}>
+        {map[status]}
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -228,6 +302,7 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
       )}
 
       {/* Naming input */}
+
       {showNamingInput && (
         <div className={styles.childSelector}>
           <h5>Buat {product.name.split('%%%')[0]} Baru</h5>
@@ -236,18 +311,24 @@ const ProductDetail = ({ willDo, setWillDo, subscriptions, product, requestLogin
             placeholder="Nama produk..."
             className={styles.input}
             value={customName}
-            onChange={(e) => setCustomName(e.target.value)}
-            style={{ width: '100%', padding: '8px', marginBottom: '16px', borderRadius: '10px' }}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\s+/g, '-'); // Ganti spasi dengan -
+              setCustomName(value);
+            }}
+            style={{ width: '100%', padding: '8px', marginBottom: '8px', borderRadius: '10px' }}
           />
 
-          <div className={styles.buttonGroup}>
+          {product.unique_name && <StatusLine />}
+
+          <div className={styles.buttonGroup} style={{ marginTop: 12 }}>
             <button className={styles.button} onClick={() => setShowNamingInput(false)}>
               Kembali
             </button>
             <button
               className={styles.button}
               onClick={onFinalCheckoutNewProduct}
-              disabled={customName.trim() === ''}
+              disabled={customName.trim() === '' || status !== 'available'}
+              title={status !== 'available' ? 'Nama belum tersedia' : 'Lanjut'}
             >
               Lanjut
             </button>
